@@ -84,9 +84,9 @@ class Pin(tk.Frame):
         self.v=StringVar()
 
     def pin_siguiente(self,controller):
-        files=os.listdir()
+        files=os.listdir('./')
         pin=self.entry_pin.get()
-        pin=int(pin)
+        #pin=int(pin)
         if 'usuarios.xlsx' in files:
             df=pandas.read_excel('usuarios.xlsx')
 
@@ -142,7 +142,7 @@ class Entrada(tk.Frame):
 
 
     def guardar_registro(self,cedula):
-        files = os.listdir()
+        files = os.listdir('./')
         if 'registro.xlsx' in files:
             us=pandas.read_excel('registro.xlsx')
             us_t=us.T
@@ -178,7 +178,7 @@ class Entrada(tk.Frame):
             datos=[nombre,telefono]
             return datos
     def comprobar_cedula(self):
-        files=os.listdir()
+        files=os.listdir('./')
         cedula=self.entry2.get()
         cedula=int(cedula)
         if 'registro.xlsx' in files:
@@ -199,13 +199,13 @@ class Entrada(tk.Frame):
 
             print("Cedula Valida")
     def ingresar_usuario(self,controller):
-        files=os.listdir()
+        files=os.listdir('./')
         cedula=self.entry2.get()
         cedula=int(cedula)
         ced=self.comprobar_cedula()
         pagePin=self.controller.get_page(Pin)
         pin=pagePin.v
-        pin=int(pin)
+        pin=str(pin)
 
         if 'usuarios.xlsx' in files: #Se agrega el nuevo usuario
             df=pandas.read_excel('usuarios.xlsx')
@@ -262,9 +262,9 @@ class Salida(tk.Frame):
         self.text1.pack()
 
     def borrar_pin(self, controller):
-        files=os.listdir()
+        files=os.listdir('./')
         pin=self.entry1.get()
-        pin=int(pin)
+        pin=str(pin)
 
         if 'usuarios.xlsx' in files:
             try:
@@ -309,9 +309,9 @@ class Verificar(tk.Frame):
         self.text1.pack()
 
     def verificar_pin(self):
-        files=os.listdir()
+        files=os.listdir('./')
         pin=self.entry1.get()
-        pin=int(pin)
+        pin=str(pin)
 
         if 'usuarios.xlsx' in files:
             df=pandas.read_excel('usuarios.xlsx')
@@ -357,9 +357,9 @@ class PinEmpleado(tk.Frame):
         self.v=StringVar()
 
     def pin_siguiente(self,controller):
-        files=os.listdir()
+        files=os.listdir('./')
         pin=self.entry_pin.get()
-        pin=int(pin)
+        pin=str(pin)
         if 'pinempleados.xlsx' in files:
             df=pandas.read_excel('pinempleados.xlsx')
 
@@ -414,10 +414,10 @@ class IngresarEmpleado(tk.Frame):
         self.text1=tk.Text(self,height=1,width=40)
         self.text1.pack()
     def ingresar_empleado(self, controller):
-        files = os.listdir()
+        files = os.listdir('./')
         pagePin=self.controller.get_page(PinEmpleado)
         pin=pagePin.v
-        pin=int(pin)
+        pin=str(pin)
         nombre=self.entry1.get()
         cedula=self.entry2.get()
         telefono=self.entry3.get()
@@ -486,7 +486,7 @@ class BorrarEmpleado(tk.Frame):
         self.text1.pack()
 
     def borrar_pin(self, controller):
-        files=os.listdir()
+        files=os.listdir('./')
         pin=self.entry1.get()
         pin=int(pin)
 
