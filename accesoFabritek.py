@@ -8,7 +8,22 @@ import os
 from datetime import datetime
 import time
 LARGE_FONT=("Verdana",12)
+NORM_FONT=("Verdana",10)
+SMALL_FONT=("Verdana",8)
 
+def popupmsg():
+    popup= tk.Tk()
+    tmp = PhotoImage(file='boton.gif')
+
+
+    #buttonStart = Button(frameWb,image=tmp,command=root.quit)
+    popup.wm_title("!")
+    label = tk.Label(image = tmp)
+    #label = ttk.Label(popup, text="Lista Empleados", font=NORM_FONT)
+    label.pack()
+    B1=ttk.Button(popup, text="Okay", command=popup.destroy)
+    B1.pack()
+    popup.mainloop()
 class ventanas(tk.Tk):
 
     def __init__(self, *args, **kwargs):
@@ -21,6 +36,16 @@ class ventanas(tk.Tk):
         container.pack(side="top", fill="both", expand= True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
+
+        menubar = tk.Menu(container)
+        filemenu = tk.Menu(menubar, tearoff=0)
+        filemenu.add_command(label="Empleados",
+                                command= lambda:popupmsg())
+        filemenu.add_separator()
+        filemenu.add_command(label="Salir", command=quit)
+        menubar.add_cascade(label="Empleados", menu=filemenu)
+
+        tk.Tk.config(self, menu= menubar)
 
         self.frames = {}
         for F in (StartPage, Entrada, Salida, Pin, Verificar, IngresarEmpleado, PinEmpleado, BorrarEmpleado):
@@ -62,6 +87,7 @@ class StartPage(tk.Frame):
                 command=lambda:controller.show_frame(BorrarEmpleado))
         button1.pack()
 
+
 class Pin(tk.Frame):
 
     def __init__(self,parent,controller):
@@ -86,7 +112,8 @@ class Pin(tk.Frame):
     def pin_siguiente(self,controller):
         files=os.listdir()
         pin=self.entry_pin.get()
-        pin=int(pin)
+
+        pin=str(pin)
         if 'usuarios.xlsx' in files:
             df=pandas.read_excel('usuarios.xlsx')
 
@@ -205,7 +232,7 @@ class Entrada(tk.Frame):
         ced=self.comprobar_cedula()
         pagePin=self.controller.get_page(Pin)
         pin=pagePin.v
-        pin=int(pin)
+        pin=str(pin)
 
         if 'usuarios.xlsx' in files: #Se agrega el nuevo usuario
             df=pandas.read_excel('usuarios.xlsx')
@@ -526,4 +553,5 @@ class BorrarEmpleado(tk.Frame):
         controller.show_frame(StartPage)
 
 app=ventanas()
+app.geometry("720x320")
 app.mainloop()
