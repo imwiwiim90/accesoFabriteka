@@ -86,7 +86,7 @@ class Pin(tk.Frame):
     def pin_siguiente(self,controller):
         files=os.listdir('./')
         pin=self.entry_pin.get()
-        #pin=int(pin)
+        pin=str(pin)
         if 'usuarios.xlsx' in files:
             df=pandas.read_excel('usuarios.xlsx')
 
@@ -488,7 +488,7 @@ class BorrarEmpleado(tk.Frame):
     def borrar_pin(self, controller):
         files=os.listdir('./')
         pin=self.entry1.get()
-        pin=int(pin)
+        pin=str(pin)
 
         if 'pinempleados.xlsx' in files:
             try:
