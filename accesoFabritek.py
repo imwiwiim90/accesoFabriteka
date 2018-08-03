@@ -7,6 +7,7 @@ import pandas
 import os
 from datetime import datetime
 import time
+
 LARGE_FONT=("Verdana",12)
 NORM_FONT=("Verdana",10)
 SMALL_FONT=("Verdana",8)
@@ -87,7 +88,6 @@ class StartPage(tk.Frame):
                 command=lambda:controller.show_frame(BorrarEmpleado))
         button1.pack()
 
-
 class Pin(tk.Frame):
 
     def __init__(self,parent,controller):
@@ -110,15 +110,15 @@ class Pin(tk.Frame):
         self.v=StringVar()
 
     def pin_siguiente(self,controller):
-        files=os.listdir()
+        files=os.listdir('./')
         pin=self.entry_pin.get()
-
         pin=str(pin)
+
         if 'usuarios.xlsx' in files:
             df=pandas.read_excel('usuarios.xlsx')
 
             try:
-                df.loc[pin]
+                pn=df.loc[pin]
                 self.text1.delete('1.0',END)
                 self.text1.insert(END,"Este Pin Ya Existe")
 
@@ -169,7 +169,7 @@ class Entrada(tk.Frame):
 
 
     def guardar_registro(self,cedula):
-        files = os.listdir()
+        files = os.listdir('./')
         if 'registro.xlsx' in files:
             us=pandas.read_excel('registro.xlsx')
             us_t=us.T
@@ -205,7 +205,7 @@ class Entrada(tk.Frame):
             datos=[nombre,telefono]
             return datos
     def comprobar_cedula(self):
-        files=os.listdir()
+        files=os.listdir('./')
         cedula=self.entry2.get()
         cedula=int(cedula)
         if 'registro.xlsx' in files:
@@ -226,7 +226,7 @@ class Entrada(tk.Frame):
 
             print("Cedula Valida")
     def ingresar_usuario(self,controller):
-        files=os.listdir()
+        files=os.listdir('./')
         cedula=self.entry2.get()
         cedula=int(cedula)
         ced=self.comprobar_cedula()
@@ -241,6 +241,7 @@ class Entrada(tk.Frame):
             nombre=datos[0]
             fecha=datetime.now()
             fecha=fecha.strftime("%Y-%m-%d-%H-%M-%f")
+            print(pin)
             df_t[pin]=[nombre,fecha,cedula]
             df=df_t.T
             writer = pandas.ExcelWriter('usuarios.xlsx', engine=None)
@@ -254,6 +255,7 @@ class Entrada(tk.Frame):
             controller.show_frame(StartPage)
 
         else:#Se crea nuevo documento de usuarios y se guarda usuario actual
+            print(pin)
             datos=self.guardar_registro(cedula)
             nombre=datos[0]
             fecha=datetime.now()
@@ -289,9 +291,9 @@ class Salida(tk.Frame):
         self.text1.pack()
 
     def borrar_pin(self, controller):
-        files=os.listdir()
+        files=os.listdir('./')
         pin=self.entry1.get()
-        pin=int(pin)
+        pin=str(pin)
 
         if 'usuarios.xlsx' in files:
             try:
@@ -335,10 +337,11 @@ class Verificar(tk.Frame):
         self.text1=tk.Text(self,height=1,width=40)
         self.text1.pack()
 
+
     def verificar_pin(self):
-        files=os.listdir()
+        files=os.listdir('./')
         pin=self.entry1.get()
-        pin=int(pin)
+        pin=str(pin)
 
         if 'usuarios.xlsx' in files:
             df=pandas.read_excel('usuarios.xlsx')
@@ -384,9 +387,9 @@ class PinEmpleado(tk.Frame):
         self.v=StringVar()
 
     def pin_siguiente(self,controller):
-        files=os.listdir()
+        files=os.listdir('./')
         pin=self.entry_pin.get()
-        pin=int(pin)
+        pin=str(pin)
         if 'pinempleados.xlsx' in files:
             df=pandas.read_excel('pinempleados.xlsx')
 
@@ -441,10 +444,10 @@ class IngresarEmpleado(tk.Frame):
         self.text1=tk.Text(self,height=1,width=40)
         self.text1.pack()
     def ingresar_empleado(self, controller):
-        files = os.listdir()
+        files = os.listdir('./')
         pagePin=self.controller.get_page(PinEmpleado)
         pin=pagePin.v
-        pin=int(pin)
+        pin=str(pin)
         nombre=self.entry1.get()
         cedula=self.entry2.get()
         telefono=self.entry3.get()
@@ -496,26 +499,76 @@ class IngresarEmpleado(tk.Frame):
             controller.show_frame(StartPage)
 
 class BorrarEmpleado(tk.Frame):
+
+
+
     def __init__(self, parent, controller):
+
         tk.Frame.__init__(self, parent)
+        def get_selected_row(event):
+            index=self.lista.curselection()
+            print(index[0])
+            self.v=index[0]
+            return(index[0])
         label = tk.Label(self,text="Borrar Empleado",font=LARGE_FONT)
-        label.pack(pady=10,padx=10)
+        label.grid(row=0,column=1)
         button1=ttk.Button(self,text="Back to Home",
                 command=lambda:self.volver(controller))
-        button1.pack()
+        button1.grid(row=0,column=0)
         self.entry_id = StringVar()
         self.entry1=tk.Entry(self,textvariable=self.entry_id)
-        self.entry1.pack()
+        self.entry1.grid(row=1,column=1)
         button3=ttk.Button(self,text="Dar Salida",
                 command=lambda:self.borrar_pin(controller))
-        button3.pack()
+        button3.grid(row=2,column=1)
         self.text1=tk.Text(self,height=1,width=20)
-        self.text1.pack()
+        self.text1.grid(row=3,column=1)
+        self.lista=Listbox(self, height=6, width=35)
+        self.lista.grid(row=4,column=1)
+        self.sb1=Scrollbar(self)
+        self.sb1.grid(row=4,column=2)
+        self.lista.configure(yscrollcommand=self.sb1.set)
+        self.sb1.configure(command=self.lista.yview)
+        self.lista.bind('<<ListboxSelect>>',get_selected_row)
+        button1=ttk.Button(self,text="llenar", command=lambda:self.llenar(controller))
+        button1.grid(row=5,column=1)
+        button1=ttk.Button(self,text="borrar", command=lambda:self.borrar(controller))
+        button1.grid(row=6,column=1)
+
+
+    def get_selected_row(self,event):
+        index=self.lista.curselection()
+        return(index[0])
+    def borrar(self,controller):
+        df=pandas.read_excel('empleados.xlsx')
+        df_t=df.T
+        d=df_t.columns
+        print(self.v)
+        row=int(self.v)-1
+
+        em=df.iloc[row]
+
+
+        el=d[row]
+        df1=df.drop(d[row])
+        df1_t=df1.T
+        d=df1_t.columns
+        a=len(d)
+        b=0
+        self.lista.delete('0',END)
+        texto=str('Cedula    Nombre    Telefono')
+        self.lista.insert(END,texto)
+        while(b<a):
+            em=df1.iloc[b]
+            texto=str(d[b])+'    '+str(em[0])+'    '+str(em[1])
+            self.lista.insert(END,texto)
+            b=b+1
+
 
     def borrar_pin(self, controller):
-        files=os.listdir()
+        files=os.listdir('./')
         pin=self.entry1.get()
-        pin=int(pin)
+        pin=str(pin)
 
         if 'pinempleados.xlsx' in files:
             try:
@@ -551,6 +604,22 @@ class BorrarEmpleado(tk.Frame):
         self.text1.delete('1.0',END)
         self.entry1.delete('0',END)
         controller.show_frame(StartPage)
+
+    def llenar(self, controller):
+        df=pandas.read_excel('empleados.xlsx')
+        df_t=df.T
+        d=df_t.columns
+        a=len(d)
+        b=0
+        self.lista.delete('0',END)
+        texto=str('Cedula    Nombre    Telefono')
+        self.lista.insert(END,texto)
+        while(b<a):
+            em=df.iloc[b]
+            texto=str(d[b])+'    '+str(em[0])+'    '+str(em[1])
+            self.lista.insert(END,texto)
+            b=b+1
+
 
 app=ventanas()
 app.geometry("720x320")
