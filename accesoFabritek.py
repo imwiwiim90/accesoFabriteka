@@ -7,8 +7,24 @@ import pandas
 import os
 from datetime import datetime
 import time
-LARGE_FONT=("Verdana",12)
 
+LARGE_FONT=("Verdana",12)
+NORM_FONT=("Verdana",10)
+SMALL_FONT=("Verdana",8)
+
+def popupmsg():
+    popup= tk.Tk()
+    tmp = PhotoImage(file='boton.gif')
+
+
+    #buttonStart = Button(frameWb,image=tmp,command=root.quit)
+    popup.wm_title("!")
+    label = tk.Label(image = tmp)
+    #label = ttk.Label(popup, text="Lista Empleados", font=NORM_FONT)
+    label.pack()
+    B1=ttk.Button(popup, text="Okay", command=popup.destroy)
+    B1.pack()
+    popup.mainloop()
 class ventanas(tk.Tk):
 
     def __init__(self, *args, **kwargs):
@@ -21,6 +37,16 @@ class ventanas(tk.Tk):
         container.pack(side="top", fill="both", expand= True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
+
+        menubar = tk.Menu(container)
+        filemenu = tk.Menu(menubar, tearoff=0)
+        filemenu.add_command(label="Empleados",
+                                command= lambda:popupmsg())
+        filemenu.add_separator()
+        filemenu.add_command(label="Salir", command=quit)
+        menubar.add_cascade(label="Empleados", menu=filemenu)
+
+        tk.Tk.config(self, menu= menubar)
 
         self.frames = {}
         for F in (StartPage, Entrada, Salida, Pin, Verificar, IngresarEmpleado, PinEmpleado, BorrarEmpleado):
@@ -91,7 +117,7 @@ class Pin(tk.Frame):
             df=pandas.read_excel('usuarios.xlsx')
 
             try:
-                df.loc[pin]
+                pn=df.loc[pin]
                 self.text1.delete('1.0',END)
                 self.text1.insert(END,"Este Pin Ya Existe")
 
@@ -214,6 +240,7 @@ class Entrada(tk.Frame):
             nombre=datos[0]
             fecha=datetime.now()
             fecha=fecha.strftime("%Y-%m-%d-%H-%M-%f")
+            print(pin)
             df_t[pin]=[nombre,fecha,cedula]
             df=df_t.T
             writer = pandas.ExcelWriter('usuarios.xlsx', engine=None)
@@ -227,6 +254,7 @@ class Entrada(tk.Frame):
             controller.show_frame(StartPage)
 
         else:#Se crea nuevo documento de usuarios y se guarda usuario actual
+            print(pin)
             datos=self.guardar_registro(cedula)
             nombre=datos[0]
             fecha=datetime.now()
@@ -307,6 +335,7 @@ class Verificar(tk.Frame):
         button2.pack()
         self.text1=tk.Text(self,height=1,width=40)
         self.text1.pack()
+
 
     def verificar_pin(self):
         files=os.listdir('./')
@@ -469,21 +498,71 @@ class IngresarEmpleado(tk.Frame):
             controller.show_frame(StartPage)
 
 class BorrarEmpleado(tk.Frame):
+
+
+
     def __init__(self, parent, controller):
+
         tk.Frame.__init__(self, parent)
+        def get_selected_row(event):
+            index=self.lista.curselection()
+            print(index[0])
+            self.v=index[0]
+            return(index[0])
         label = tk.Label(self,text="Borrar Empleado",font=LARGE_FONT)
-        label.pack(pady=10,padx=10)
+        label.grid(row=0,column=1)
         button1=ttk.Button(self,text="Back to Home",
                 command=lambda:self.volver(controller))
-        button1.pack()
+        button1.grid(row=0,column=0)
         self.entry_id = StringVar()
         self.entry1=tk.Entry(self,textvariable=self.entry_id)
-        self.entry1.pack()
+        self.entry1.grid(row=1,column=1)
         button3=ttk.Button(self,text="Dar Salida",
                 command=lambda:self.borrar_pin(controller))
-        button3.pack()
+        button3.grid(row=2,column=1)
         self.text1=tk.Text(self,height=1,width=20)
-        self.text1.pack()
+        self.text1.grid(row=3,column=1)
+        self.lista=Listbox(self, height=6, width=35)
+        self.lista.grid(row=4,column=1)
+        self.sb1=Scrollbar(self)
+        self.sb1.grid(row=4,column=2)
+        self.lista.configure(yscrollcommand=self.sb1.set)
+        self.sb1.configure(command=self.lista.yview)
+        self.lista.bind('<<ListboxSelect>>',get_selected_row)
+        button1=ttk.Button(self,text="llenar", command=lambda:self.llenar(controller))
+        button1.grid(row=5,column=1)
+        button1=ttk.Button(self,text="borrar", command=lambda:self.borrar(controller))
+        button1.grid(row=6,column=1)
+
+
+    def get_selected_row(self,event):
+        index=self.lista.curselection()
+        return(index[0])
+    def borrar(self,controller):
+        df=pandas.read_excel('empleados.xlsx')
+        df_t=df.T
+        d=df_t.columns
+        print(self.v)
+        row=int(self.v)-1
+
+        em=df.iloc[row]
+
+
+        el=d[row]
+        df1=df.drop(d[row])
+        df1_t=df1.T
+        d=df1_t.columns
+        a=len(d)
+        b=0
+        self.lista.delete('0',END)
+        texto=str('Cedula    Nombre    Telefono')
+        self.lista.insert(END,texto)
+        while(b<a):
+            em=df1.iloc[b]
+            texto=str(d[b])+'    '+str(em[0])+'    '+str(em[1])
+            self.lista.insert(END,texto)
+            b=b+1
+
 
     def borrar_pin(self, controller):
         files=os.listdir('./')
@@ -525,5 +604,22 @@ class BorrarEmpleado(tk.Frame):
         self.entry1.delete('0',END)
         controller.show_frame(StartPage)
 
+    def llenar(self, controller):
+        df=pandas.read_excel('empleados.xlsx')
+        df_t=df.T
+        d=df_t.columns
+        a=len(d)
+        b=0
+        self.lista.delete('0',END)
+        texto=str('Cedula    Nombre    Telefono')
+        self.lista.insert(END,texto)
+        while(b<a):
+            em=df.iloc[b]
+            texto=str(d[b])+'    '+str(em[0])+'    '+str(em[1])
+            self.lista.insert(END,texto)
+            b=b+1
+
+
 app=ventanas()
+app.geometry("720x320")
 app.mainloop()

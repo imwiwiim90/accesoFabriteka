@@ -3,8 +3,6 @@ import time
 import os
 import pandas
 
-
-
 '''
 
 ports = list(serial.tools.list_ports.comports())
@@ -41,7 +39,7 @@ class ModuloPuerta(threading.Thread):
 	def __init__(self):
 		threading.Thread.__init__(self)
 		self.serial = None
-		self.port = None 
+		self.port = None
 		self.connected = False
 
 	def run(self):
@@ -104,7 +102,7 @@ class ModuloPuerta(threading.Thread):
 
 
 # abrir usuarios
-# 
+#
 
 # v -> valido
 # i -> invalido
@@ -112,6 +110,3 @@ m = ModuloPuerta()
 
 m.start()
 m.join()
-
-
-
