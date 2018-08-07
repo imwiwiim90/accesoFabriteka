@@ -25,6 +25,34 @@ def popupmsg():
     B1=ttk.Button(popup, text="Okay", command=popup.destroy)
     B1.pack()
     popup.mainloop()
+def verificarPin(pin):
+    a=0
+    files=os.listdir('./')
+
+    if 'PinUsuarios.xlsx' in files:
+        df=pandas.read_excel('PinUsuarios.xlsx')
+        try:
+            fe=df.loc[pin]
+            a=1
+            return True
+
+        except KeyError:
+            print('nn')
+
+    if a==0 :
+        if 'empleados.xlsx' in files:
+            em=pandas.read_excel('empleados.xlsx')
+            try:
+                em=em.loc[pin]
+                return True
+
+            except KeyError:
+                return False
+
+        else:
+            return False
+
+
 class ventanas(tk.Tk):
 
     def __init__(self, *args, **kwargs):
@@ -40,16 +68,29 @@ class ventanas(tk.Tk):
 
         menubar = tk.Menu(container)
         filemenu = tk.Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Empleados",
-                                command= lambda:popupmsg())
+        filemenu.add_command(label="Añadir Empleado",
+                                command= lambda:self.show_frame(PinEmpleado))
+        filemenu.add_command(label="Borrar Empleado",
+                                command= lambda:self.show_frame(BorrarEmpleado))
         filemenu.add_separator()
         filemenu.add_command(label="Salir", command=quit)
         menubar.add_cascade(label="Empleados", menu=filemenu)
 
+
+
+
+        filemenu2 = tk.Menu(menubar, tearoff=0)
+        filemenu2.add_command(label="Cambiar Pin",
+                                command= lambda:self.show_frame(PinEmpleado))
+    
+        filemenu2.add_separator()
+        filemenu2.add_command(label="Salir", command=quit)
+        menubar.add_cascade(label="Opciones", menu=filemenu2)
         tk.Tk.config(self, menu= menubar)
 
         self.frames = {}
-        for F in (StartPage, Entrada, Salida, Pin, Verificar, IngresarEmpleado, PinEmpleado, BorrarEmpleado):
+        for F in (StartPage, Entrada, Salida, Pin, Verificar, IngresarEmpleado,
+                            PinEmpleado, BorrarEmpleado, Cedula):
 
             frame = F(container, self)
 
@@ -81,12 +122,6 @@ class StartPage(tk.Frame):
         button1=ttk.Button(self,text="Verificar",
                 command=lambda:controller.show_frame(Verificar))
         button1.pack()
-        button1=ttk.Button(self,text="Ingresar Empleado",
-                command=lambda:controller.show_frame(PinEmpleado))
-        button1.pack()
-        button1=ttk.Button(self,text="Eliminar Empleado",
-                command=lambda:controller.show_frame(BorrarEmpleado))
-        button1.pack()
 
 class Pin(tk.Frame):
 
@@ -97,7 +132,7 @@ class Pin(tk.Frame):
         label.pack(pady=10,padx=10)
 
         button1=ttk.Button(self,text="Back Home",
-                command=lambda:controller.show_frame(StartPage))
+                command=lambda:self.volver(controller))
         button1.pack()
         self.entry_pin=tk.Entry(self)
         self.entry_pin.pack()
@@ -113,45 +148,140 @@ class Pin(tk.Frame):
         files=os.listdir('./')
         pin=self.entry_pin.get()
         pin=str(pin)
-
-        if 'usuarios.xlsx' in files:
-            df=pandas.read_excel('usuarios.xlsx')
-
-            try:
-                pn=df.loc[pin]
-                self.text1.delete('1.0',END)
-                self.text1.insert(END,"Este Pin Ya Existe")
-
-
-            except KeyError:
-                print("Pin Valido")
-                self.v=str(pin)
-                self.entry_pin.delete('0',END)
-                self.text1.delete('1.0',END)
-                controller.show_frame(Entrada)
+        if verificarPin(pin):
+            self.text1.delete('1.0',END)
+            self.text1.insert(END,"Este Pin Ya Existe")
         else:
-            print("Pin Valido")
             self.v=str(pin)
             self.entry_pin.delete('0',END)
             self.text1.delete('1.0',END)
+            controller.show_frame(Cedula)
+
+
+
+    def volver(self, controller):
+        self.text1.delete('1.0',END)
+        self.entry_pin.delete('0',END)
+        controller.show_frame(StartPage)
+
+class Cedula(tk.Frame):
+
+    def __init__(self,parent,controller):
+        tk.Frame.__init__(self,parent)
+        self.controller=controller
+        label = tk.Label(self,text="Ingresar Cedula",font=LARGE_FONT)
+        label.pack(pady=10,padx=10)
+
+        button1=ttk.Button(self,text="Back Home",
+                command=lambda:self.volver(controller))
+        button1.pack()
+        self.entry_ced=tk.Entry(self)
+        self.entry_ced.pack()
+        button3=ttk.Button(self,text="Ingresar Cedula",
+                command=lambda:self.cedula_siguiente(controller))
+        button3.pack()
+        self.text1=tk.Text(self,height=1,width=40)
+        self.text1.pack()
+
+        self.c=StringVar()
+
+    def cedula_siguiente(self,controller):
+        a=0
+        files=os.listdir('./')
+        cedula=self.entry_ced.get()
+        cedula=int(cedula)
+        pagePin=self.controller.get_page(Pin)
+        pin=pagePin.v
+        pin=str(pin)
+
+        if 'PinUsuarios.xlsx' in files:
+            us=pandas.read_excel('PinUsuarios.xlsx')
+
+            us2=us.set_index('Cedula')
+            print(us2.index)
+            try:
+                us2.loc[cedula]
+                self.text1.delete('1.0',END)
+                self.text1.insert(END,"Esta usuario ya tiene un Pin asignado")
+                a=1
+
+            except KeyError:
+                print("Cedula valida")
+
+
+        if 'usuarios.xlsx' in files:
+            df=pandas.read_excel('usuarios.xlsx')
+            us_t=df.T
+            try:
+                pn=df.loc[cedula]
+                print(cedula)
+
+                if a==0:
+                    self.entry_ced.delete('0',END)
+                    self.text1.delete('1.0',END)
+                    usuario=df.loc[cedula]
+
+                    usuario[2]=usuario[2]+1
+
+                    us_t[cedula]=[usuario[0],usuario[1],usuario[2]]
+                    us=us_t.T
+                    writer = pandas.ExcelWriter('usuarios.xlsx', engine=None)
+                    us.to_excel(writer, sheet_name='Sheet1')
+                    writer.save()
+                    fecha=datetime.now()
+                    hora=fecha.strftime("%H:%M")
+                    fecha=fecha.strftime("%Y-%m-%d")
+
+                    df = pandas.DataFrame({pin: [cedula]})
+                    df=df.T
+                    writer = pandas.ExcelWriter('PinUsuarios.xlsx', engine=None)
+                    df.to_excel(writer, sheet_name='Sheet1')
+                    writer.save()
+                    rg=pandas.read_excel('RegistroTarjeta.xlsx')
+                    rg_t=rg.T
+                    col=rg_t.columns
+                    l=len(col)
+                    rg_t[l]=[cedula, fecha, hora, 'Entrada']
+                    rg=rg_t.T
+                    writer = pandas.ExcelWriter('RegistroTarjeta.xlsx', engine=None)
+                    rg.to_excel(writer, sheet_name='Sheet1')
+                    writer.save()
+                    messagebox.showinfo("Ingresar Usuario", "El Usuario "+ usuario[0]
+                                                +" Ha sido ingresado Exitosamente")
+                    controller.show_frame(StartPage)
+                else:
+                    print("paila")
+
+            except KeyError:
+                print("Cedula Nueva")
+                self.c=cedula
+                self.entry_ced.delete('0',END)
+                self.text1.delete('1.0',END)
+                controller.show_frame(Entrada)
+        else:
+            print("Cedula Nueva")
+            self.c=cedula
+            self.entry_ced.delete('0',END)
+            self.text1.delete('1.0',END)
             controller.show_frame(Entrada)
+
+    def volver(self, controller):
+        self.text1.delete('1.0',END)
+        self.entry_ced.delete('0',END)
+        controller.show_frame(StartPage)
 
 class Entrada(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller=controller
+
         label = tk.Label(self,text="Dar Entrada",font=LARGE_FONT)
         label.pack(pady=10,padx=10)
         button1=ttk.Button(self,text="Back to Home",
                 command=lambda:controller.show_frame(StartPage))
         button1.pack()
 
-        self.entry2=tk.Entry(self)
-        self.entry2.pack()
-        button3=ttk.Button(self,text="Ingresar cedula",
-                command=self.comprobar_cedula)
-        button3.pack()
         label1 = tk.Label(self,text="Nombre",font=LARGE_FONT)
         label1.pack(pady=10,padx=10)
         self.entry3=tk.Entry(self)
@@ -170,25 +300,27 @@ class Entrada(tk.Frame):
 
     def guardar_registro(self,cedula):
         files = os.listdir('./')
-        if 'registro.xlsx' in files:
-            us=pandas.read_excel('registro.xlsx')
+        if 'usuarios.xlsx' in files:
+            us=pandas.read_excel('usuarios.xlsx')
             us_t=us.T
             try:
                 usuario=us.loc[cedula]
                 usuario[2]=usuario[2]+1
                 us_t[cedula]=[usuario[0],usuario[1],usuario[2]]
                 us=us_t.T
-                writer = pandas.ExcelWriter('registro.xlsx', engine=None)
+
+                writer = pandas.ExcelWriter('usuarios.xlsx', engine=None)
                 us.to_excel(writer, sheet_name='Sheet1')
                 writer.save()
                 datos=[usuario[0],usuario[1]]
                 return datos
             except KeyError:
                 nombre=self.entry3.get()
-                telefono=self.entry4.get()
+                telefono=int(self.entry4.get())
                 us_t[cedula]=[nombre,telefono,1]
                 us=us_t.T
-                writer = pandas.ExcelWriter('registro.xlsx', engine=None)
+
+                writer = pandas.ExcelWriter('usuarios.xlsx', engine=None)
                 us.to_excel(writer, sheet_name='Sheet1')
                 writer.save()
                 datos=[nombre,telefono]
@@ -196,59 +328,54 @@ class Entrada(tk.Frame):
 
         else:
             nombre=self.entry3.get()
-            telefono=self.entry4.get()
+            telefono=int(self.entry4.get())
             us = pandas.DataFrame({cedula: [nombre,telefono,1]})
             us=us.T
-            writer = pandas.ExcelWriter('registro.xlsx', engine=None)
+            us.columns=['Nombre', 'Telefono', 'Recurrencia']
+            writer = pandas.ExcelWriter('usuarios.xlsx', engine=None)
             us.to_excel(writer, sheet_name='Sheet1')
             writer.save()
+
             datos=[nombre,telefono]
             return datos
-    def comprobar_cedula(self):
-        files=os.listdir('./')
-        cedula=self.entry2.get()
-        cedula=int(cedula)
-        if 'registro.xlsx' in files:
-            df=pandas.read_excel('registro.xlsx')
 
-            try:
-                us=df.loc[cedula]
-                print("ya se ha ingresado esta cedula")
-                self.entry3.delete('0',END)
-                self.entry4.delete('0',END)
-                self.entry3.insert(END,us[0])
-                self.entry4.insert(END,us[1])
-
-            except KeyError:
-                print("Cedula Valida")
-
-        else:
-
-            print("Cedula Valida")
     def ingresar_usuario(self,controller):
         files=os.listdir('./')
-        cedula=self.entry2.get()
-        cedula=int(cedula)
-        ced=self.comprobar_cedula()
+        pageCed=self.controller.get_page(Cedula)
+        cedula=int(pageCed.c)
+        # cedula=self.entry2.get()
+        # cedula=int(cedula)
+        # ced=self.comprobar_cedula()
         pagePin=self.controller.get_page(Pin)
         pin=pagePin.v
         pin=str(pin)
 
-        if 'usuarios.xlsx' in files: #Se agrega el nuevo usuario
-            df=pandas.read_excel('usuarios.xlsx')
+        if 'PinUsuarios.xlsx' in files: #Se agrega el nuevo usuario
+            df=pandas.read_excel('PinUsuarios.xlsx')
             df_t=df.T
             datos=self.guardar_registro(cedula)
             nombre=datos[0]
             fecha=datetime.now()
-            fecha=fecha.strftime("%Y-%m-%d-%H-%M-%f")
+            hora=fecha.strftime("%H:%M")
+            fecha=fecha.strftime("%Y-%m-%d")
             print(pin)
-            df_t[pin]=[nombre,fecha,cedula]
+            df_t[pin]=[cedula]
             df=df_t.T
-            writer = pandas.ExcelWriter('usuarios.xlsx', engine=None)
+            writer = pandas.ExcelWriter('PinUsuarios.xlsx', engine=None)
             df.to_excel(writer, sheet_name='Sheet1')
             writer.save()
+
+            rg=pandas.read_excel('RegistroTarjeta.xlsx')
+            rg_t=rg.T
+            col=rg_t.columns
+            l=len(col)
+            rg_t[l]=[cedula, fecha, hora, 'Entrada']
+            rg=rg_t.T
+            writer = pandas.ExcelWriter('RegistroTarjeta.xlsx', engine=None)
+            rg.to_excel(writer, sheet_name='Sheet1')
+            writer.save()
             messagebox.showinfo("Ingresar Usuario", "Usuario Ingresado Exitosamente")
-            self.entry2.delete('0',END)
+
             self.entry3.delete('0',END)
             self.entry4.delete('0',END)
             self.text1.delete('1.0',END)
@@ -260,13 +387,23 @@ class Entrada(tk.Frame):
             nombre=datos[0]
             fecha=datetime.now()
             fecha=fecha.strftime("%Y-%m-%d-%H-%M-%f")
-            df = pandas.DataFrame({pin: [nombre,fecha,cedula]})
+            df = pandas.DataFrame({pin: [cedula]})
             df=df.T
-            writer = pandas.ExcelWriter('usuarios.xlsx', engine=None)
+            df.columns=['Cedula']
+            writer = pandas.ExcelWriter('PinUsuarios.xlsx', engine=None)
             df.to_excel(writer, sheet_name='Sheet1')
             writer.save()
+            fecha=datetime.now()
+            hora=fecha.strftime("%H:%M")
+            fecha=fecha.strftime("%Y-%m-%d")
+            rg = pandas.DataFrame({0:[cedula,fecha,hora,'Entrada']})
+            rg=rg.T
+            rg.columns=['Cedula', 'Fecha', 'Hora', 'Entrada/salida']
+            writer = pandas.ExcelWriter('RegistroTarjeta.xlsx', engine=None)
+            rg.to_excel(writer, sheet_name='Sheet1')
+            writer.save()
             messagebox.showinfo("Ingresar Usuario", "Usuario Ingresado Exitosamente")
-            self.entry2.delete('0',END)
+
             self.entry3.delete('0',END)
             self.entry4.delete('0',END)
             self.text1.delete('1.0',END)
@@ -279,10 +416,10 @@ class Salida(tk.Frame):
         label = tk.Label(self,text="Dar Salida",font=LARGE_FONT)
         label.pack(pady=10,padx=10)
         button1=ttk.Button(self,text="Back to Home",
-                command=lambda:controller.show_frame(StartPage))
+                command=lambda:self.volver(controller))
         button1.pack()
         self.entry_id = StringVar()
-        self.entry1=tk.Entry(self,textvariable=self.entry_id)
+        self.entry1=tk.Entry(self)
         self.entry1.pack()
         button3=ttk.Button(self,text="Dar Salida",
                 command=lambda:self.borrar_pin(controller))
@@ -295,29 +432,48 @@ class Salida(tk.Frame):
         pin=self.entry1.get()
         pin=str(pin)
 
-        if 'usuarios.xlsx' in files:
+        if 'PinUsuarios.xlsx' in files:
             try:
-                df=pandas.read_excel('usuarios.xlsx')
+                df=pandas.read_excel('PinUsuarios.xlsx')
                 fe=df.loc[pin]
-                FechaIngreso=fe[1]
-                Ingreso=datetime.strptime(FechaIngreso,"%Y-%m-%d-%H-%M-%f")#Cambiar formato a uno mas amigable en el registro
-                Ahora=datetime.now()
-                delta=Ahora-Ingreso
-                delta = str(delta)
-                print(delta)
+                cedula=fe[0]
+                #FechaIngreso=fe[1]
+                #Ingreso=datetime.strptime(FechaIngreso,"%Y-%m-%d-%H-%M-%f")#Cambiar formato a uno mas amigable en el registro
+                #Ahora=datetime.now()
+                #delta=Ahora-Ingreso
+                #delta = str(delta)
+                #print(delta)
                 df1=df.drop(pin)
-                writer = pandas.ExcelWriter('usuarios.xlsx', engine=None)
+                writer = pandas.ExcelWriter('PinUsuarios.xlsx', engine=None)
                 df1.to_excel(writer, sheet_name='Sheet1')
                 writer.save()
-                messagebox.showinfo("Dar Salida a Usuario", "Usuario Borrado Exitosamente, Tiempo de usuario: "+ delta)
+                fecha=datetime.now()
+                hora=fecha.strftime("%H:%M")
+                fecha=fecha.strftime("%Y-%m-%d")
+                rg=pandas.read_excel('RegistroTarjeta.xlsx')
+                rg_t=rg.T
+                col=rg_t.columns
+                l=len(col)
+                rg_t[l]=[cedula, fecha, hora, 'Salida']
+                rg=rg_t.T
+                writer = pandas.ExcelWriter('RegistroTarjeta.xlsx', engine=None)
+                rg.to_excel(writer, sheet_name='Sheet1')
+                writer.save()
+                messagebox.showinfo("Dar Salida a Usuario", "Usuario Borrado Exitosamente")
                 self.entry1.delete('0',END)
+                self.text1.delete('1.0',END)
                 controller.show_frame(StartPage)
             except KeyError:
-                print("Este pin no existe")
-
+                self.text1.insert(END,"Este pin no existe")
+                self.entry1.delete('0',END)
         else:
-            print("este pin no existe")
+            self.text1.insert(END,"Este pin no existe")
             self.entry1.delete('0',END)
+
+    def volver(self, controller):
+        self.text1.delete('1.0',END)
+        self.entry1.delete('0',END)
+        controller.show_frame(StartPage)
 
 class Verificar(tk.Frame):
 
@@ -339,30 +495,50 @@ class Verificar(tk.Frame):
 
 
     def verificar_pin(self):
+        a=0
         files=os.listdir('./')
         pin=self.entry1.get()
         pin=str(pin)
 
-        if 'usuarios.xlsx' in files:
-            df=pandas.read_excel('usuarios.xlsx')
+        if 'PinUsuarios.xlsx' in files:
+            df=pandas.read_excel('PinUsuarios.xlsx')
             try:
                 fe=df.loc[pin]
-                cedula=fe[2]
-                reg=pandas.read_excel('registro.xlsx')
+                cedula=fe[0]
+                reg=pandas.read_excel('usuarios.xlsx')
                 us=reg.loc[cedula]
                 self.text1.delete('1.0',END)
-                self.text1.insert(END,"este pin pertenece a: "+us[0])
+                self.text1.insert(END,"este pin pertenece al cliente : "+us[0])
                 print("este pin pertenece a: "+us[0])
                 self.entry1.delete('0',END)
+                a=1
             except KeyError:
                 self.text1.delete('1.0',END)
                 self.text1.insert(END,"este pin no esta registrado")
 
-        else:
-            print("este pin no existe")
-            self.entry1.delete('0',END)
+        if a==0 :
+            if 'empleados.xlsx' in files:
+                em=pandas.read_excel('empleados.xlsx')
+                try:
+                    em=em.loc[pin]
+                    cedula=em[2]
+
+                    self.text1.delete('1.0',END)
+                    self.text1.insert(END,"este pin pertenece al empleado : "+em[0])
+
+                    self.entry1.delete('0',END)
+
+                except KeyError:
+                    self.text1.delete('1.0',END)
+                    self.text1.insert(END,"este pin no esta registrado")
+
+            else:
+                self.text1.delete('1.0',END)
+                self.text1.insert(END,"este pin no esta registrado")
+
     def volver(self, controller):
         self.text1.delete('1.0',END)
+        self.entry1.delete('0',END)
         controller.show_frame(StartPage)
 
 class PinEmpleado(tk.Frame):
@@ -390,23 +566,10 @@ class PinEmpleado(tk.Frame):
         files=os.listdir('./')
         pin=self.entry_pin.get()
         pin=str(pin)
-        if 'pinempleados.xlsx' in files:
-            df=pandas.read_excel('pinempleados.xlsx')
-
-            try:
-                df.loc[pin]
-                self.text1.delete('1.0',END)
-                self.text1.insert(END,"Este Pin Ya Existe")
-
-
-            except KeyError:
-                print("Pin Valido")
-                self.v=str(pin)
-                self.entry_pin.delete('0',END)
-                self.text1.delete('1.0',END)
-                controller.show_frame(IngresarEmpleado)
+        if verificarPin(pin):
+            self.text1.delete('1.0',END)
+            self.text1.insert(END,"Este Pin Ya Existe")
         else:
-            print("Pin Valido")
             self.v=str(pin)
             self.entry_pin.delete('0',END)
             self.text1.delete('1.0',END)
@@ -425,7 +588,7 @@ class IngresarEmpleado(tk.Frame):
         label = tk.Label(self,text="Ingresar Empleado",font=LARGE_FONT)
         label.pack(pady=10,padx=10)
         button1=ttk.Button(self,text="Back to Home",
-                command=lambda:controller.show_frame(StartPage))
+                command=lambda:self.volver(controller))
         button1.pack()
         label1 = tk.Label(self,text="Nombre",font=LARGE_FONT)
         label1.pack(pady=10,padx=10)
@@ -454,43 +617,37 @@ class IngresarEmpleado(tk.Frame):
         cedula=int(cedula)
         if 'empleados.xlsx' in files:
             em=pandas.read_excel('empleados.xlsx')
+            em1=em.set_index('Cedula')
+            print(em1)
             try :
-                empleado=em.loc[cedula]
-                self.text1.insert(END,"Ya existe un usuario con esta cedula : "+empleado[0]+", con CC: "+ empleado[2])
+                em1.loc[cedula]
+                self.text1.insert(END,"Ya existe un pin asociado a este empleado ")
                 self.entry1.delete('0',END)
                 self.entry2.delete('0',END)
                 self.entry3.delete('0',END)
 
 
             except KeyError:
-                pn= pandas.read_excel('pinempleados.xlsx')
+
                 em_t=em.T
-                em_t[cedula]=[nombre,telefono]
+                em_t[pin]=[nombre,telefono,cedula]
                 em=em_t.T
                 writer = pandas.ExcelWriter('empleados.xlsx', engine=None)
                 em.to_excel(writer, sheet_name='Sheet1')
                 writer.save()
-                pn_t=pn.T
-                pn_t[pin]=[nombre,telefono,cedula]
-                pn=pn_t.T
-                writer = pandas.ExcelWriter('pinempleados.xlsx', engine=None)
-                pn.to_excel(writer, sheet_name='Sheet1')
-                writer.save()
+
                 messagebox.showinfo("Ingresar Empleado", "Empleado Ingresado Exitosamente")
                 self.entry1.delete('0',END)
                 self.entry2.delete('0',END)
                 self.entry3.delete('0',END)
+                self.text1.delete('1.0',END)
                 controller.show_frame(StartPage)
         else:
-            em = pandas.DataFrame({cedula: [nombre,telefono]})
+            em = pandas.DataFrame({pin: [nombre, telefono, cedula]})
             em=em.T
+            em.columns=['Nombre','Telefono', 'Cedula']
             writer = pandas.ExcelWriter('empleados.xlsx', engine=None)
             em.to_excel(writer, sheet_name='Sheet1')
-            writer.save()
-            pn = pandas.DataFrame({pin: [nombre,telefono,cedula]})
-            pn=pn.T
-            writer = pandas.ExcelWriter('pinempleados.xlsx', engine=None)
-            pn.to_excel(writer, sheet_name='Sheet1')
             writer.save()
             messagebox.showinfo("Ingresar Empleado", "Empleado Ingresado Exitosamente")
             self.entry1.delete('0',END)
@@ -498,9 +655,14 @@ class IngresarEmpleado(tk.Frame):
             self.entry3.delete('0',END)
             controller.show_frame(StartPage)
 
+    def volver(self, controller):
+        self.text1.delete('1.0',END)
+        self.entry1.delete('0',END)
+        self.entry2.delete('0',END)
+        self.entry3.delete('0',END)
+        controller.show_frame(StartPage)
+
 class BorrarEmpleado(tk.Frame):
-
-
 
     def __init__(self, parent, controller):
 
@@ -516,13 +678,7 @@ class BorrarEmpleado(tk.Frame):
                 command=lambda:self.volver(controller))
         button1.grid(row=0,column=0)
         self.entry_id = StringVar()
-        self.entry1=tk.Entry(self,textvariable=self.entry_id)
-        self.entry1.grid(row=1,column=1)
-        button3=ttk.Button(self,text="Dar Salida",
-                command=lambda:self.borrar_pin(controller))
-        button3.grid(row=2,column=1)
-        self.text1=tk.Text(self,height=1,width=20)
-        self.text1.grid(row=3,column=1)
+
         self.lista=Listbox(self, height=6, width=35)
         self.lista.grid(row=4,column=1)
         self.sb1=Scrollbar(self)
@@ -545,64 +701,29 @@ class BorrarEmpleado(tk.Frame):
         d=df_t.columns
         print(self.v)
         row=int(self.v)-1
-
         em=df.iloc[row]
-
-
         el=d[row]
         df1=df.drop(d[row])
         df1_t=df1.T
         d=df1_t.columns
+        writer = pandas.ExcelWriter('empleados.xlsx', engine=None)
+        df1.to_excel(writer, sheet_name='Sheet1')
+        writer.save()
         a=len(d)
         b=0
         self.lista.delete('0',END)
-        texto=str('Cedula    Nombre    Telefono')
+        texto=str('Pin    Nombre    Telefono    Cedula')
         self.lista.insert(END,texto)
         while(b<a):
             em=df1.iloc[b]
-            texto=str(d[b])+'    '+str(em[0])+'    '+str(em[1])
+            texto=str(d[b])+'    '+str(em[0])+'    '+str(em[1])+ '    '+str (em[2])
             self.lista.insert(END,texto)
             b=b+1
 
 
-    def borrar_pin(self, controller):
-        files=os.listdir('./')
-        pin=self.entry1.get()
-        pin=str(pin)
-
-        if 'pinempleados.xlsx' in files:
-            try:
-                df=pandas.read_excel('pinempleados.xlsx')
-                dfe=pandas.read_excel('empleados.xlsx')
-                ce=df.loc[pin]
-                cedula=ce[2]
-                cedula=int(cedula)
-                em=dfe.loc[cedula]
-                dfe1=dfe.drop(cedula)
-                df1=df.drop(pin)
-                writer = pandas.ExcelWriter('pinempleados.xlsx', engine=None)
-                df1.to_excel(writer, sheet_name='Sheet1')
-                writer.save()
-                writer = pandas.ExcelWriter('empleados.xlsx', engine=None)
-                dfe1.to_excel(writer, sheet_name='Sheet1')
-                writer.save()
-                messagebox.showinfo("Borrar Empleado", "El empleado: "+ce[0]+", Ha sido borrado exitosamente")
-                self.entry1.delete('0',END)
-                controller.show_frame(StartPage)
-            except KeyError:
-                print("Este pin no existe")
-                self.text1.delete('1.0',END)
-                self.text1.insert(END,'este pin no existe')
-
-        else:
-            print("este pin no existe")
-            self.text1.delete('1.0',END)
-            self.text1.insert(END,'este pin no existe')
-            self.entry1.delete('0',END)
-
     def volver(self, controller):
-        self.text1.delete('1.0',END)
-        self.entry1.delete('0',END)
+
+        self.lista.delete('0',END)
         controller.show_frame(StartPage)
 
     def llenar(self, controller):
@@ -612,11 +733,11 @@ class BorrarEmpleado(tk.Frame):
         a=len(d)
         b=0
         self.lista.delete('0',END)
-        texto=str('Cedula    Nombre    Telefono')
+        texto=str('Pin    Nombre    Telefono    Cedula')
         self.lista.insert(END,texto)
         while(b<a):
             em=df.iloc[b]
-            texto=str(d[b])+'    '+str(em[0])+'    '+str(em[1])
+            texto=str(d[b])+'    '+str(em[0])+'    '+str(em[1])+'    '+str(em[2])
             self.lista.insert(END,texto)
             b=b+1
 
