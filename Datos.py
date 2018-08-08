@@ -3,12 +3,13 @@ import os
 
 DEFAULT_SHEET_NAME = 'Sheet1'
 class ExcelManager():
-	def __init__(self,filename,keys):
+	def __init__(self,filename,keys,index=None):
 		files = os.listdir('./')
 		self.filename = filename
 		if not self.filename in files:
 			os.popen('touch ' + self.filename)
 		self.keys = keys
+		self.index = index
 
 	def new_entry(self,item):
 		try:
@@ -25,6 +26,17 @@ class ExcelManager():
 		data = pandas.read_excel(self.filename)
 		if len(data) == 0:
 			return None
+		# set data as unindexed
+		if self.index:
+			new_data = {}
+			for k in self.keys:
+				new_data[k] = []
+				for index in data.index.values:
+					if k == self.index:
+						new_data[k].append(index)
+					else:
+						new_data[k].append(data.loc[index][k])
+			data = pandas.DataFrame({k: new_data[k] for k in self.keys})
 		if type(val) is str:
 			data[key] = data[key].astype('|S')
 
@@ -47,13 +59,14 @@ class ExcelManager():
 
 class Usuarios():
 	def __init__(self):
-		self.excelMngr= ExcelManager('users.xlsx',['cedula','nombre','telefono'])
+		self.excelMngr= ExcelManager('usuarios.xlsx',['Cedula','Nombre','Telefono'],'Cedula')
 
 	def obtenerPorCedula(self,cedula):
-		return self.excelMngr.find_entry('cedula',cedula)	
+		return self.excelMngr.find_entry('Cedula',cedula)	
 
 	def crearUsuario(self,usuario):
 		return self.excelMngr.new_entry(usuario)
+
 
 
 users = Usuarios()
@@ -62,4 +75,4 @@ users = Usuarios()
 	'cedula': '1020202',
 	'telefono': '310222929',
 	})'''
-print users.obtenerPorCedula('1020202')
+print users.obtenerPorCedula(1020810530)
