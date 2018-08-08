@@ -150,6 +150,7 @@ class Pin(tk.Frame):
         files=os.listdir('./')
         pin=self.entry_pin.get()
         pin=str(pin)
+<<<<<<< HEAD
         if verificarPin(pin):
             self.text1.delete('1.0',END)
             self.text1.insert(END,"Este Pin Ya Existe")
@@ -160,6 +161,10 @@ class Pin(tk.Frame):
             controller.show_frame(Cedula)
 
 
+=======
+        if 'usuarios.xlsx' in files:
+            df=pandas.read_excel('usuarios.xlsx')
+>>>>>>> c0bf269a742fe99e400991a6f92f9cae228cf4a7
 
     def volver(self, controller):
         self.text1.delete('1.0',END)

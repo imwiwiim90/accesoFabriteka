@@ -81,10 +81,9 @@ class ModuloPuerta(threading.Thread):
 		if 'usuarios.xlsx' in files:
 			df = pandas.read_excel('usuarios.xlsx')
 			try:
-				print df
+				# 9315886B
 				print pin
-				print df.iloc[0]
-				print df.loc[str(pin)]
+				df.loc[pin]
 				return True
 			except:
 				return False
@@ -98,7 +97,7 @@ class ModuloPuerta(threading.Thread):
 	def readPin(self):
 		info = self.serial.readline()
 		if (re.match(r'modulo2:\s(\d|\s)+',info)):
-			return ''.join(info[9:].split(' '))
+			return ''.join(re.findall(r'\s(\w\w)+',info))
 		return None
 
 
