@@ -72,6 +72,8 @@ class ventanas(tk.Tk):
                                 command= lambda:self.show_frame(PinEmpleado))
         filemenu.add_command(label="Borrar Empleado",
                                 command= lambda:self.show_frame(BorrarEmpleado))
+        filemenu.add_command(label="Cambiar Pin",
+                                command= lambda:self.show_frame(BorrarEmpleado))
         filemenu.add_separator()
         filemenu.add_command(label="Salir", command=quit)
         menubar.add_cascade(label="Empleados", menu=filemenu)
@@ -81,16 +83,16 @@ class ventanas(tk.Tk):
 
         filemenu2 = tk.Menu(menubar, tearoff=0)
         filemenu2.add_command(label="Cambiar Pin",
-                                command= lambda:self.show_frame(PinEmpleado))
-    
+                                command= lambda:self.show_frame(CedulaCambiar))
+
         filemenu2.add_separator()
         filemenu2.add_command(label="Salir", command=quit)
-        menubar.add_cascade(label="Opciones", menu=filemenu2)
+        menubar.add_cascade(label="Clientes", menu=filemenu2)
         tk.Tk.config(self, menu= menubar)
 
         self.frames = {}
         for F in (StartPage, Entrada, Salida, Pin, Verificar, IngresarEmpleado,
-                            PinEmpleado, BorrarEmpleado, Cedula):
+                            PinEmpleado, BorrarEmpleado, Cedula, CedulaCambiar, CambiarCliente):
 
             frame = F(container, self)
 
@@ -741,6 +743,116 @@ class BorrarEmpleado(tk.Frame):
             self.lista.insert(END,texto)
             b=b+1
 
+class CedulaCambiar(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller=controller
+        label = tk.Label(self,text="Cambiar Pin Cliente",font=LARGE_FONT)
+        label.pack(pady=10,padx=10)
+        button1=ttk.Button(self,text="Back to Home",
+                command=lambda:self.volver(controller))
+        button1.pack()
+        label = tk.Label(self,text="Cedula",font=LARGE_FONT)
+        label.pack(pady=10,padx=10)
+        self.entry1=tk.Entry(self)
+        self.entry1.pack()
+        button2=ttk.Button(self,text="Cambiar",
+                command=lambda:self.verificar_cedula(controller))
+        button2.pack()
+        self.text1=tk.Text(self,height=1,width=40)
+        self.text1.pack()
+
+
+    def verificar_cedula(self,controller):
+        a=0
+        files=os.listdir('./')
+        cedula=self.entry1.get()
+        cedula=int(cedula)
+
+        if 'PinUsuarios.xlsx' in files:
+            df=pandas.read_excel('PinUsuarios.xlsx')
+            ced=df.set_index('Cedula')
+            try:
+                ced.loc[cedula]
+                self.cc=cedula
+                self.text1.delete('1.0',END)
+                self.entry1.delete('0',END)
+                controller.show_frame(CambiarCliente)
+            except KeyError:
+                self.text1.delete('1.0',END)
+                self.text1.insert(END,"este usuario no tiene un pin asignado")
+
+
+
+    def volver(self, controller):
+        self.text1.delete('1.0',END)
+        self.entry1.delete('0',END)
+        controller.show_frame(StartPage)
+
+class CambiarCliente(tk.Frame):
+
+    def __init__(self,parent,controller):
+        tk.Frame.__init__(self,parent)
+        self.controller=controller
+        label = tk.Label(self,text="Ingresar Pin",font=LARGE_FONT)
+        label.pack(pady=10,padx=10)
+
+        button1=ttk.Button(self,text="Back Home",
+                command=lambda:self.volver(controller))
+        button1.pack()
+        self.entry_pin=tk.Entry(self)
+        self.entry_pin.pack()
+        button3=ttk.Button(self,text="Cambiar Pin",
+                command=lambda:self.cambiar(controller))
+        button3.pack()
+        self.text1=tk.Text(self,height=1,width=40)
+        self.text1.pack()
+
+        self.c=StringVar()
+
+    def cambiar(self,controller):
+
+        files=os.listdir('./')
+        pin=self.entry_pin.get()
+        pin=str(pin)
+        if verificarPin(pin):
+            self.text1.delete('1.0',END)
+            self.entry_pin.delete('0',END)
+            self.text1.insert(END,'Ya existe este Pin')
+
+        else:
+            pageCedula=self.controller.get_page(CedulaCambiar)
+            cedula=pageCedula.cc
+            cedula=int(cedula)
+            df=pandas.read_excel('PinUsuarios.xlsx')
+            ced=df.set_index('Cedula')
+            c=ced.loc[cedula]
+            dt=ced.T
+            cee=dt.columns.tolist()
+            ind=cee.index(cedula)
+            br=df.index
+
+            pin_b=br[ind]
+            print(pin_b)
+            dff=df.drop(pin_b)
+            df_t=dff.T
+            df_t[pin]=[cedula]
+            df=df_t.T
+            writer = pandas.ExcelWriter('PinUsuarios.xlsx', engine=None)
+            df.to_excel(writer, sheet_name='Sheet1')
+            writer.save()
+            self.text1.delete('1.0',END)
+            self.entry_pin.delete('0',END)
+            messagebox.showinfo("Cambiar Pn Cliente", "Se ha cambiado el pin exitosamente")
+            controller.show_frame(StartPage)
+
+
+
+    def volver(self, controller):
+        self.text1.delete('1.0',END)
+        self.entry_pin.delete('0',END)
+        controller.show_frame(StartPage)
 
 app=ventanas()
 app.geometry("720x320")
