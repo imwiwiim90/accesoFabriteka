@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Hello World!</title>
+    </head>
+    <body>
+      <h1>Hello World!</h1>
+      We are using node <script>document.write(process.versions.node)</script>,
+      Chrome <script>document.write(process.versions.chrome)</script>,
+      and Electron <script>document.write(process.versions.electron)</script>.
+      <button id='btn'>verificarPin</button>
+    </body>
+    <script type="text/javascript">
+      window.$ = window.jQuery = require('./node_modules/jquery/dist/jquery.min.js');
+      var PYTHON_ADDRS = '127.0.0.1';
+      var PYTHON_PORT  = '5000';
+      function verificarPin() {
+        $.ajax({
+          url: 'http://' + PYTHON_ADDRS + ':' + PYTHON_PORT + '/verificarPin',
+          method: 'GET',
+          data: {
+            pin: '12345',
+          },
+          success: function(data) {
+            alert(data);
+          },
+          error: function(data) {
+            alert("error:" + data);
+            console.log(data)
+          }
+        })
+      }
+      
+
+      $('#btn').on('click',function() {
+        verificarPin();
+
+      })
+    </script>
+  </html>
