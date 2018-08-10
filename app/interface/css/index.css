@@ -12,10 +12,16 @@ body, html {
 
 
 #main-container {
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
 	width: 70%;
+	color: #FBFAF0;
+	padding: 30px 60px;
 }
 
 #side-menu {
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
 	width: 30%;
 	background-color: #FBFAF0;
 	display: flex;
@@ -24,12 +30,27 @@ body, html {
 	padding: 0px 0;
 }
 
+
 #side-menu button {
+    transition: background-color 150ms ease-in-out,
+    			color 150ms ease-in-out;
 	background-color: #FF0001;
-	width: 100px;	
-	height: 100px;	
+	width: 140px;	
+	height: 140px;	
 	display: block;
 	border-radius: 30px;
 	border: none;
-	margin: 40px auto;
+	margin: 20px auto;
+	-webkit-appearance: none;
+    -moz-appearance: none;
+    outline: none;
+
+    font-family: 'Oswald-bold';
+    font-size: 35px;
+    color: #FBFAF0;
+}
+
+#side-menu button:hover {
+	background-color: #FBFAF0;
+	color: #FF0001;
 }

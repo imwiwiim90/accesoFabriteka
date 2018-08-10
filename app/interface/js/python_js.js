@@ -8,7 +8,7 @@ class PythonJS {
 		var self = this;
 		for (var i = 0; i < functions_name.length; i++) {
 			var name = functions_name[i];
-			functions[functions_name[i]] = function() {
+			self[functions_name[i]] = function() {
 				var arguments_ = [];
 				for (var j = 0; j < arguments.length; j++) arguments_.push(arguments[j]);
 
@@ -27,7 +27,6 @@ class PythonJS {
 				})
 			}
 		}
-		this.functions = functions;
 	}
 }
 
