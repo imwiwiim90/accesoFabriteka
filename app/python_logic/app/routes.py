@@ -3,8 +3,13 @@
 from app import app
 from flask import request
 from accesoFabriteka import *
+import urlparse
 import json
 
+
+functions = {
+    'verificarPin' : verificarPin,
+}
 
 @app.route('/')
 @app.route('/index')
@@ -12,9 +17,17 @@ def index():
     return "Hello, World!"
 
 @app.route('/verificarPin')
-def route_verificar_pin():
-	pin = request.args.get('pin')
-	return json.dumps(verificarPin(pin))
+def general_routes():
+    try:
+        query = urlparse.parse_qs(request.query_string)
+        path = request.path.replace('/','')
+        if 'data[]' in query:
+            args = query['data[]']
+            return json.dumps(functions[path](*args))
+        else:
+            return json.dumps(functions[path]())
+    except:
+        return None
 
 '''
 # -*- coding: utf-8 -*-
