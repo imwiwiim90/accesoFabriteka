@@ -11,11 +11,6 @@ functions = {
     'verificarPin' : verificarPin,
 }
 
-@app.route('/')
-@app.route('/index')
-def index():
-    return "Hello, World!"
-
 @app.route('/verificarPin')
 def general_routes():
     try:
