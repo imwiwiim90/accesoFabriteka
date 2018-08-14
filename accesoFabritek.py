@@ -13,46 +13,285 @@ LARGE_FONT=("Verdana",12)
 NORM_FONT=("Verdana",10)
 SMALL_FONT=("Verdana",8)
 
-def popupmsg():
-    popup= tk.Tk()
-    tmp = PhotoImage(file='button.png')
-
-
-    #buttonStart = Button(frameWb,image=tmp,command=root.quit)
-    popup.wm_title("!")
-    label = tk.Label(image = tmp)
-    #label = ttk.Label(popup, text="Lista Empleados", font=NORM_FONT)
-    label.pack()
-    B1=ttk.Button(popup, text="Okay", command=popup.destroy)
-    B1.pack()
-    popup.mainloop()
+# verifica si el pin no existe tanto en empleados como en clientes, retorna True si existe, False si no
 def verificarPin(pin):
-    a=0
+
     files=os.listdir('./')
 
     if 'PinUsuarios.xlsx' in files:
         df=pandas.read_excel('PinUsuarios.xlsx')
+
         try:
             fe=df.loc[pin]
-            a=1
             return True
-
         except KeyError:
-            print('nn')
+            pass
+
+
+    if 'empleados.xlsx' in files:
+        em=pandas.read_excel('empleados.xlsx')
+
+        try:
+            em=em.loc[pin]
+            return True
+        except KeyError:
+            return False
+
+    else:
+        return False
+
+#retorna 1 si tiene un pin asignado, 2 si la cedula ya existe en el sistema y 3 si es una cedula nueva
+def verificarCedulaCliente(cedula):
+
+        files=os.listdir('./')
+        cedula=int(cedula)
+
+        if 'PinUsuarios.xlsx' in files:
+            us=pandas.read_excel('PinUsuarios.xlsx')
+            us2=us.set_index('Cedula')
+
+            try:
+                us2.loc[cedula]
+                return 1
+            except KeyError:
+                pass
+
+        if 'usuarios.xlsx' in files:
+            df=pandas.read_excel('usuarios.xlsx')
+
+            try:
+                pn=df.loc[cedula]
+                return 2
+            except KeyError:
+                return 3
+
+        else:
+            return 3
+
+#Se agrega nuevo PinUsuarios y su resectivo registro de tarjeta,retorna True si guardo, False si no se pudo
+def nuevoPinCliente(pin, cedula):
+
+    files=os.listdir('./')
+    pin=str(pin)
+    cedula=int(cedula)
+    if 'PinUsuarios.xlsx' in files: #Se agrega el nuevo usuario
+        df=pandas.read_excel('PinUsuarios.xlsx')
+        df_t=df.T
+        fecha=datetime.now()
+        hora=fecha.strftime("%H:%M")
+        fecha=fecha.strftime("%Y-%m-%d")
+        df_t[pin]=[cedula]
+        df=df_t.T
+        writer = pandas.ExcelWriter('PinUsuarios.xlsx', engine=None)
+        df.to_excel(writer, sheet_name='Sheet1')
+        writer.save()
+        rg=pandas.read_excel('RegistroTarjeta.xlsx')
+        rg_t=rg.T
+        col=rg_t.columns
+        l=len(col)
+        rg_t[l]=[cedula, fecha, hora, 'Entrada']
+        rg=rg_t.T
+        writer = pandas.ExcelWriter('RegistroTarjeta.xlsx', engine=None)
+        rg.to_excel(writer, sheet_name='Sheet1')
+        writer.save()
+
+
+    else:#Se crea nuevo documento de usuarios y se guarda usuario actual
+        print(pin)
+        fecha=datetime.now()
+        fecha=fecha.strftime("%Y-%m-%d-%H-%M-%f")
+        df = pandas.DataFrame({pin: [cedula]})
+        df=df.T
+        df.columns=['Cedula']
+        writer = pandas.ExcelWriter('PinUsuarios.xlsx', engine=None)
+        df.to_excel(writer, sheet_name='Sheet1')
+        writer.save()
+        fecha=datetime.now()
+        hora=fecha.strftime("%H:%M")
+        fecha=fecha.strftime("%Y-%m-%d")
+        rg = pandas.DataFrame({0:[cedula,fecha,hora,'Entrada']})
+        rg=rg.T
+        rg.columns=['Cedula', 'Fecha', 'Hora', 'Entrada/salida']
+        writer = pandas.ExcelWriter('RegistroTarjeta.xlsx', engine=None)
+        rg.to_excel(writer, sheet_name='Sheet1')
+        writer.save()
+
+#Se Borra Pin con su respectivo registro y retorna True, si n oexiste el pin retorna False
+def borrarPinCliente(pin):
+    files=os.listdir('./')
+    pin=str(pin)
+
+    if 'PinUsuarios.xlsx' in files:
+        try:
+            df=pandas.read_excel('PinUsuarios.xlsx')
+            fe=df.loc[pin]
+            cedula=fe[0]
+            df1=df.drop(pin)
+            writer = pandas.ExcelWriter('PinUsuarios.xlsx', engine=None)
+            df1.to_excel(writer, sheet_name='Sheet1')
+            writer.save()
+            fecha=datetime.now()
+            hora=fecha.strftime("%H:%M")
+            fecha=fecha.strftime("%Y-%m-%d")
+            rg=pandas.read_excel('RegistroTarjeta.xlsx')
+            rg_t=rg.T
+            col=rg_t.columns
+            l=len(col)
+            rg_t[l]=[cedula, fecha, hora, 'Salida']
+            rg=rg_t.T
+            writer = pandas.ExcelWriter('RegistroTarjeta.xlsx', engine=None)
+            rg.to_excel(writer, sheet_name='Sheet1')
+            writer.save()
+            return True
+        except KeyError:
+            return False
+    else:
+        return False
+
+#Retorna lista con datos de el dueño del pin[cliente/empleado,nombre,telefono,cedula], si no existe retorna None
+def verificarPinAsignado(pin):
+
+    a=0
+    files=os.listdir('./')
+    pin=str(pin)
+
+    if 'PinUsuarios.xlsx' in files:
+        df=pandas.read_excel('PinUsuarios.xlsx')
+
+        try:
+            fe=df.loc[pin]
+            cedula=fe[0]
+            reg=pandas.read_excel('usuarios.xlsx')
+            us=reg.loc[cedula]
+            a=1
+            datos=['cliente',us[0], us[1], us[2]]
+            return datos
+        except KeyError:
+            pass
 
     if a==0 :
+
         if 'empleados.xlsx' in files:
             em=pandas.read_excel('empleados.xlsx')
             try:
                 em=em.loc[pin]
-                return True
+                cedula=em[2]
+                datos=['empleado',em[0], em[1], em[2]]
+                return datos
+            except KeyError:
+                pass
 
+        else:
+            return None
+
+#Guarda En usuarios y en registro tarjeta si la cedula ya existe en usuarios
+def ingresarClienteExistente(cedula):
+    files=os.listdir('./')
+    cedula=int(cedula)
+    df=pandas.read_excel('usuarios.xlsx')
+    us_t=df.T
+    pn=df.loc[cedula]
+    usuario=df.loc[cedula]
+    us_t[cedula]=[usuario[0],usuario[1]]
+    us=us_t.T
+    writer = pandas.ExcelWriter('usuarios.xlsx', engine=None)
+    us.to_excel(writer, sheet_name='Sheet1')
+    writer.save()
+    fecha=datetime.now()
+    hora=fecha.strftime("%H:%M")
+    fecha=fecha.strftime("%Y-%m-%d")
+
+
+#En caso de que la persona no este en usuarios aqui se haria el registro
+def ingresarNuevoCliente(cedula, nombre , telefono):
+    files = os.listdir('./')
+
+    if 'usuarios.xlsx' in files:
+        us=pandas.read_excel('usuarios.xlsx')
+        us_t=us.T
+        us_t[cedula]=[nombre,telefono]
+        us=us_t.T
+        writer = pandas.ExcelWriter('usuarios.xlsx', engine=None)
+        us.to_excel(writer, sheet_name='Sheet1')
+        writer.save()
+
+    else:
+        us = pandas.DataFrame({cedula: [nombre,telefono]})
+        us=us.T
+        us.columns=['Nombre', 'Telefono']
+        writer = pandas.ExcelWriter('usuarios.xlsx', engine=None)
+        us.to_excel(writer, sheet_name='Sheet1')
+        writer.save()
+
+#Retorna True si ya existe un empeado com esa cedula, Retorna False si es un cedula nueva
+def verificarCedulaEmpleado(cedula):
+
+        files=os.listdir('./')
+        cedula=int(cedula)
+
+        if 'empleados.xlsx' in files:
+            us=pandas.read_excel('empleados.xlsx')
+            us2=us.set_index('Cedula')
+
+            try:
+                us2.loc[cedula]
+                return True
             except KeyError:
                 return False
 
         else:
             return False
 
+#ingresa un nuevo empleado
+def ingresarEmpleado(pin, nombre, cedula, telefono):
+    files = os.listdir('./')
+    pin=str(pin)
+    cedula=int(cedula)
+
+    if 'empleados.xlsx' in files:
+        em=pandas.read_excel('empleados.xlsx')
+        em_t=em.T
+        em_t[pin]=[nombre,telefono,cedula]
+        em=em_t.T
+        writer = pandas.ExcelWriter('empleados.xlsx', engine=None)
+        em.to_excel(writer, sheet_name='Sheet1')
+        writer.save()
+    else:
+        em = pandas.DataFrame({pin: [nombre, telefono, cedula]})
+        em=em.T
+        em.columns=['Nombre','Telefono', 'Cedula']
+        writer = pandas.ExcelWriter('empleados.xlsx', engine=None)
+        em.to_excel(writer, sheet_name='Sheet1')
+        writer.save()
+
+#si Borra el empleado retorna True, si no existe retorna False
+def borrarEmpleado(pin):
+    files=os.listdir('./')
+    pin=str(pin)
+
+    if 'empleados.xlsx' in files:
+        try:
+            df=pandas.read_excel('empleados.xlsx')
+            fe=df.loc[pin]
+            df1=df.drop(pin)
+            writer = pandas.ExcelWriter('empleados.xlsx', engine=None)
+            df1.to_excel(writer, sheet_name='Sheet1')
+            writer.save()
+            return True
+        except KeyError:
+            return False
+    else:
+        return False
+
+#Falta
+# def cambiarCliente(cedula):
+# #Falta
+# def cambiarEmpleado(cedula):
+
+
+
+# funcion verificar cedula Cliente/Empleado, ingresar Cliente, ingresar Empleado
+# Verificar Pin, Borrar Empelado/Cliente, Cambiar Pin de Empleado/Cliente.
 
 class ventanas(tk.Tk):
 
@@ -237,7 +476,7 @@ class Cedula(tk.Frame):
                     fecha=datetime.now()
                     hora=fecha.strftime("%H:%M")
                     fecha=fecha.strftime("%Y-%m-%d")
-
+                    type(pin)
                     df = pandas.DataFrame({pin: [cedula]})
                     df=df.T
                     writer = pandas.ExcelWriter('PinUsuarios.xlsx', engine=None)
@@ -364,7 +603,7 @@ class Entrada(tk.Frame):
             fecha=datetime.now()
             hora=fecha.strftime("%H:%M")
             fecha=fecha.strftime("%Y-%m-%d")
-            print(pin)
+            print(type(pin))
             df_t[pin]=[cedula]
             df=df_t.T
             writer = pandas.ExcelWriter('PinUsuarios.xlsx', engine=None)
@@ -393,6 +632,7 @@ class Entrada(tk.Frame):
             nombre=datos[0]
             fecha=datetime.now()
             fecha=fecha.strftime("%Y-%m-%d-%H-%M-%f")
+            print(type(pin))
             df = pandas.DataFrame({pin: [cedula]})
             df=df.T
             df.columns=['Cedula']
@@ -858,6 +1098,21 @@ class CambiarCliente(tk.Frame):
         self.entry_pin.delete('0',END)
         controller.show_frame(StartPage)
 
-app=ventanas()
-app.geometry("720x320")
-app.mainloop()
+# app=ventanas()
+# app.geometry("720x320")
+# app.mainloop()
+# cedula=1221
+# pin='bbb'
+# nombre='sds'
+# telefono=310
+# if verificarPin(pin):
+#     print('pin reistrado')
+# else:
+#     if verificarCedulaCliente(cedula)==2:
+#         ingresarClienteExistente(cedula)
+#         nuevoPinCliente(pin,cedula)
+#         print('success2')
+#     if verificarCedulaCliente(cedula)==3:
+#         ingresarNuevoCliente(cedula, nombre, telefono)
+#         nuevoPinCliente(pin, cedula)
+#         print('success3')
