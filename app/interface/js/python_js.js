@@ -1,7 +1,8 @@
 class PythonJS {
 	constructor() {
 		console.log('contructed')
-		var functions_name = ['verificarPin'];
+		var functions_name = ['verificarPin','nuevoCliente','verificarCedulaCliente',
+		'nuevoEmpleado','borrarEmpleado'];
 
 
 		var functions = {};

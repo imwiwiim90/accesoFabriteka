@@ -134,6 +134,7 @@ def verificarPinAsignado(pin):
 
         else:
             return None
+
 #Se agrega nuevo PinUsuarios y su resectivo registro de tarjeta,retorna True si guardo, False si no se pudo
 def nuevoPinCliente(pin, cedula):
 
