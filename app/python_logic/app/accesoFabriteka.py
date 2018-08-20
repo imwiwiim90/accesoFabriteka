@@ -1,6 +1,8 @@
 # --*-- coding: utf-8 --*--
 import os
 import pandas
+from datetime import datetime
+import time
 
 
 
@@ -38,7 +40,7 @@ def verificarPin(pin):
 def ingresarNuevoCliente(cedula, nombre , telefono, correo):
     files = os.listdir('./')
 
-    if 'usuarios.xlsx' in files and 'PinUsuarios.xlsx' in files:
+    if 'usuarios.xlsx' in files:
         us=pandas.read_excel('usuarios.xlsx')
         us_t=us.T
         us_t[cedula]=[nombre,telefono,correo]
@@ -190,7 +192,6 @@ def borrarPinCliente(pin):
 # TODO
 # Retorna lista con datos de el dueño del pin [cliente/empleado,nombre,telefono,correo,cedula], si no existe retorna None
 def verificarPinAsignado(pin):
-
     a=0
     files=os.listdir('./')
     pin=str(pin)
@@ -204,13 +205,15 @@ def verificarPinAsignado(pin):
             reg=pandas.read_excel('usuarios.xlsx')
             us=reg.loc[cedula]
             a=1
+            print us
+            print us[0]
             datos=['cliente',us[0], us[1], us[2], cedula]
+            print datos
             return datos
         except KeyError:
             pass
 
     if a==0 :
-
         if 'empleados.xlsx' in files:
             em=pandas.read_excel('empleados.xlsx')
             try:
@@ -256,7 +259,7 @@ def duracion(cedula):
 
 # TODO
 #Retorna numero de veces al mes de un usuario en especifico
-def entradas_mensuales(cedula, año, mes):
+def entradas_mensuales(cedula, year, mes):
     a=0
     b=0
     if file_name in files:
@@ -271,7 +274,7 @@ def entradas_mensuales(cedula, año, mes):
             cedula=rtc1.loc[cedula]
             ced=cedula.index.values
             print(cedula)
-            fecha=año + '-' + mes
+            fecha=year + '-' + mes
             for f in ced:
                 if fecha in cedula.iloc[a][0] and 'Entrada' in cedula.iloc[a][2]:
                     b=b+1
@@ -282,7 +285,7 @@ def entradas_mensuales(cedula, año, mes):
 # TODO
 # Restorna lista de diccionario que contiene los usuarios que ingresaron en el mes dado con la siguiente
 # estructura : {cedula, nombre , telefono , correo, veces este mes}
-def movimientos_mes(año, mes):
+def movimientos_mes(year, mes):
     a=0
     if file_name1 in files and file_name2 in files:
         rt=pandas.read_excel(file_name1)
@@ -290,7 +293,7 @@ def movimientos_mes(año, mes):
         if len(rt)==0:
             return None
         else:
-            fecha=año + '-' + mes
+            fecha=year + '-' + mes
             usr=us.index.values.tolist()
             rtf=rt.index.values.tolist()
             ob=[]
@@ -323,7 +326,7 @@ def movimientos_mes(año, mes):
 # TODO
 # Restorna lista de diccionario que contiene los usuarios que ingresaron en el dia dado con la siguiente
 # estructura : {cedula, nombre , telefono , correo}
-def movimientos_dia(año, mes, dia):
+def movimientos_dia(year, mes, dia):
     a=0
     if file_name1 in files and file_name2 in files:
         rt=pandas.read_excel(file_name1)
@@ -332,7 +335,7 @@ def movimientos_dia(año, mes, dia):
             return None
         else:
             try:
-                fecha=año + '-' + mes + '-' + dia
+                fecha=year + '-' + mes + '-' + dia
                 usr=us.index.values.tolist()
                 rt1=rt.set_index('Fecha')
                 rtf=rt1.loc[fecha]
@@ -431,6 +434,7 @@ def borrarEmpleado(pin):
 # TODO
 # Cambia el pin de un empleado en caso de perdida, recordar hacer verificacion de cedula y pin
 def cambiarEmpleado(cedula, pin):
+    cedula = int(cedula)
     em=pandas.read_excel('empleados.xlsx')
     em1=em.set_index('Cedula')
     em1=em1.index.values.tolist()

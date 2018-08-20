@@ -7,6 +7,7 @@ var python = new Python();
 var tests = {
 	nuevoCliente : function() {
 		python.nuevoCliente('102020000','wallace','302323222','wia@c.com');
+		python.nuevoCliente('102020120','wallas','30343323222','w@c.com');
 	},
 	verificarCedulaCliente: function() {
 		python.verificarCedulaCliente('102020000')
@@ -18,6 +19,25 @@ var tests = {
 	},
 	borrarEmpleado: function() {
 		python.borrarEmpleado('12DFF34343DD');
+	},
+	cambiarPinEmpleado: function() {
+		python.cambiarPinEmpleado('1020339494','12DFCAMBEDE12')
+	},
+	asignarPinCliente: function() {
+		python.asignarPinCliente('12EEDDNEW2321','102020000');
+	},
+	cambiarPinCliente: function() {
+		python.cambiarPinCliente('102020000','12EEDDCAMB2321');
+	},
+	obtenerClientePorPin: function() {
+		python.obtenerPorPin('12EEDDCAMB2321');
+	},
+	desasignarPinCliente: function() {
+		python.desasignarPinCliente('12EEDDCAMB2321');
+	},
+	verificarCedulaEmpleado: function() {
+		python.verificarCedulaEmpleado('120293233');
+		python.verificarCedulaEmpleado('1020339494');
 	}
 }
 
@@ -29,7 +49,11 @@ $(document).ready(function() {
   function btnOnClick(event) {
     //id_ = $(event.target).attr('id').replace('btn-','');
     //window.location.href = './' + id_ + '.html';
-    tests.borrarEmpleado();
+    //tests.nuevoCliente();
+    //tests.verificarCedulaCliente();
+    //tests.asignarPinCliente();
+    //tests.cambiarPinCliente();
+    tests.verificarCedulaEmpleado();
   }
 
   $('#btn-entrance').on('click',btnOnClick)

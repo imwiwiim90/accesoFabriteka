@@ -12,16 +12,16 @@ functions = {
     'nuevoCliente' : ingresarNuevoCliente,
     'nuevoEmpleado' : ingresarEmpleado,
     'verificarCedulaCliente' : verificarCedulaCliente,
-    'borrarEmpleado': borrarEmpleado,
+    'borrarEmpleado' : borrarEmpleado,
     'cambiarPinEmpleado' : cambiarEmpleado,
     'cambiarPinCliente' : cambiarCliente,
     'asignarPinCliente' : nuevoPinCliente,
-    'desasignarPinCliente' : borrarPinCliente
-    'obtenerClientePorPin' : verificarPinAsignado,
-    'verificarCedulaEmpleado' : verificarCedulaEmpleado
+    'desasignarPinCliente' : borrarPinCliente,
+    'obtenerPorPin' : verificarPinAsignado,
+    'verificarCedulaEmpleado' : verificarCedulaEmpleado,
     'entradasMensuales' : entradas_mensuales,
     'movimientosMes' : movimientos_mes,
-    'movimientos_dia' : movimientos_dia,
+    'movimientosDia' : movimientos_dia,
     'duracionConTarjeta' : duracion,
 }
 
@@ -31,12 +31,14 @@ functions = {
 @app.route('/nuevoEmpleado')
 @app.route('/borrarEmpleado')
 @app.route('/cambiarPinEmpleado')
+@app.route('/cambiarPinCliente')
 @app.route('/asignarPinCliente')
 @app.route('/desasignarPinCliente')
-@app.route('/obtenerClientePorPin')
+@app.route('/obtenerPorPin')
 @app.route('/verificarCedulaEmpleado')
 @app.route('/entradasMensuales')
 @app.route('/movimientosMes')
+@app.route('/movimientosDia')
 @app.route('/duracionConTarjeta')
 def general_routes():
     try:
