@@ -15,18 +15,26 @@
           <br/>
           <button class='lg' id='btn-check-id'>Ingresar</button>
         </div>
+        <div id='client-has-rfid'>
+          <h1>Este cliente ya tiene una tarjeta asociada, dale salida, o cambiale la tarjeta</h1>
+        </div>
         <div id='client-info'>
           <h2>Primera vez!</h2>
           <h2>cc: <label id='title-cc'></label></h2>
           <label class="sm">Nombre</label>
-          <input type='text' class='lg'/>
+          <input type='text' class='lg' id='name'/>
           <label class="sm">Telefono</label>
-          <input type='text' class='lg'/>
+          <input type='text' class='lg' id='phone'/>
+          <label class="sm">Email</label>
+          <input type='text' class='lg' id='mail'/>
+
           <button class='lg' id='btn-submit-info'>Continuar</button>
         </div>
         <div id='container-get-rfid'>
           <div id='container-loading'></div>
           <h1>Carga la manilla con la información</h1>
+          <input type="text" class='lg' id='input-rfid' name="">
+          <button class='lg' id='btn-rfid'>RFID</button>
         </div>
       </div>
       <div id='side-menu'>

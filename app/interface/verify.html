@@ -9,10 +9,24 @@
     </head>
     <body>
       <div id='main-container'>
-          <h1>Verificar la tarjeta</h1>
           <div id='container-get-rfid'>
+            <h1>Verificar la tarjeta</h1>
             <div id='container-loading'></div>
             <h1>Pasa la tarjeta por el modulo</h1>
+            <input type="text" class='lg' id='input-rfid' name="">
+            <button class='lg' id='btn-rfid'>RFID</button>
+          </div>
+          <div id='container-not-found' style='display:none'>
+            <h1>Esta tarjeta no se encuentra registrada en el sistema</h1>
+            <br/>
+            <button class='lg' id='btn-again'>Verificar otra tarjeta</button>
+          </div>
+          <div id='container-info' style='display: none'>
+            <h1 id='info-type'></h1>
+            <h1>Nombre: <span id='info-name'></span></h1>
+            <h2>Cedula: <span id='info-cc'></span></h2>
+            <h2>Email: <span id='info-mail'></span></h2>
+            <h2>Teléfono: <span id='info-phone'></span></h2>
           </div>
       </div>
       <div id='side-menu'>

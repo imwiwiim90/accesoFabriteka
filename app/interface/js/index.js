@@ -47,13 +47,8 @@ $(document).ready(function() {
   console.log('ready')
 
   function btnOnClick(event) {
-    //id_ = $(event.target).attr('id').replace('btn-','');
-    //window.location.href = './' + id_ + '.html';
-    //tests.nuevoCliente();
-    //tests.verificarCedulaCliente();
-    //tests.asignarPinCliente();
-    //tests.cambiarPinCliente();
-    tests.verificarCedulaEmpleado();
+    id_ = $(event.target).attr('id').replace('btn-','');
+    window.location.href = './' + id_ + '.html';
   }
 
   $('#btn-entrance').on('click',btnOnClick)

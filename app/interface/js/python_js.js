@@ -27,7 +27,8 @@ class PythonJS {
 			self[functions_name[i]] = function() {
 				var arguments_ = [];
 				for (var j = 0; j < arguments.length; j++) arguments_.push(arguments[j]);
-
+				var callback;
+				if (typeof arguments[arguments.length-1] === 'function') callback = arguments_.pop();
 				$.ajax({
 					method: 'GET',
 					data: {
@@ -35,7 +36,7 @@ class PythonJS {
 					},
 					url: url,
 					success(response) {
-						console.log(response)
+						callback(response);
 					},
 					error(response) {
 						console.log(response)

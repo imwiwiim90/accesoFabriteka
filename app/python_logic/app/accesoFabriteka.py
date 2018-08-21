@@ -134,6 +134,7 @@ def nuevoPinCliente(pin, cedula):
         writer = pandas.ExcelWriter('RegistroTarjeta.xlsx', engine=None)
         rg.to_excel(writer, sheet_name='Sheet1')
         writer.save()
+    return None
 
 
 # TODO
