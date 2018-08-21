@@ -185,7 +185,7 @@ def nuevoPinCliente(pin, cedula):
 def ingresarNuevoCliente(cedula, nombre , telefono, correo):
     files = os.listdir('./')
 
-    if 'usuarios.xlsx' in files and 'PinUsuarios.xlsx' in files:
+    if 'usuarios.xlsx' in files:
         us=pandas.read_excel('usuarios.xlsx')
         us_t=us.T
         us_t[cedula]=[nombre,telefono,correo]
@@ -303,6 +303,8 @@ def cambiarEmpleado(cedula, pin):
 def entradas_mensuales(cedula, año, mes):
     a=0
     b=0
+    file_name='RegistroTarjeta.xlsx'
+    files=os.listdir('./')
     if file_name in files:
         rt=pandas.read_excel(file_name)
         if len(rt)==0:
@@ -325,6 +327,9 @@ def entradas_mensuales(cedula, año, mes):
 #Restorna lista de diccionario que contiene los usuarios que ingresaron en el mes dado con la siguiente
 #estructura : {cedula, nombre , telefono , correo, veces este mes}
 def movimientos_mes(año, mes):
+    file_name1='RegistroTarjeta.xlsx'
+    file_name2='usuarios.xlsx'
+    files=os.listdir('./')
     a=0
     if file_name1 in files and file_name2 in files:
         rt=pandas.read_excel(file_name1)
@@ -366,6 +371,9 @@ def movimientos_mes(año, mes):
 #estructura : {cedula, nombre , telefono , correo}
 def movimientos_dia(año, mes, dia):
     a=0
+    file_name1='RegistroTarjeta.xlsx'
+    file_name2='usuarios.xlsx'
+    files=os.listdir('./')
     if file_name1 in files and file_name2 in files:
         rt=pandas.read_excel(file_name1)
         us=pandas.read_excel(file_name2)
@@ -1253,3 +1261,5 @@ class CambiarCliente(tk.Frame):
 #         print('3')
 #     elif verificarCedulaCliente(cedula)==1:
 #         print('ya esta registrado')
+
+print(movimientos_dia('2018', '08','17'))
