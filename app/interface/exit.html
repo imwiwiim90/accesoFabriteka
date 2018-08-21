@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Fabriteka</title>
+      <link rel="stylesheet" type="text/css" href="./css/fonts.css">
+      <link rel="stylesheet" type="text/css" href="./css/main.css">
+      <link rel="stylesheet" type="text/css" href="./css/index.css">
+    </head>
+    <body>
+      <div id='main-container'>
+          <h1>Salida</h1>
+          <div id='container-get-rfid'>
+            <div id='container-loading'></div>
+            <h1>Pasa la tarjeta por el modulo</h1>
+            <input type="text" class='lg' id='input-rfid' name="">
+            <button class='lg' id='btn-rfid'>RFID</button>
+          </div>
+          <div id='container-info' style='display:none'>
+            <h2>Tiempo total:</h2>
+            <h1 id='total-time'></h1>
+          </div>
+      </div>
+      <div id='side-menu'>
+        <button id='btn-back'>Volver</button>
+      </div>
+    </body>
+    <script type="text/javascript" src='./js/python_js.js'></script>
+    <script type="text/javascript" src='./js/verify.js'></script>
+    <script type="text/javascript" src='./js/exit.js'></script>
+  </html>

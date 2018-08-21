@@ -75,4 +75,4 @@ users = Usuarios()
 	'cedula': '1020202',
 	'telefono': '310222929',
 	})'''
-print users.obtenerPorCedula(1020810530)
+print users.obtenerPorCedula(10229393)

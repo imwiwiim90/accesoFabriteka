@@ -9,14 +9,37 @@ import json
 
 functions = {
     'verificarPin' : verificarPin,
+    'nuevoCliente' : ingresarNuevoCliente,
+    'nuevoEmpleado' : ingresarEmpleado,
+    'verificarCedulaCliente' : verificarCedulaCliente,
+    'borrarEmpleado' : borrarEmpleado,
+    'cambiarPinEmpleado' : cambiarEmpleado,
+    'cambiarPinCliente' : cambiarCliente,
+    'asignarPinCliente' : nuevoPinCliente,
+    'desasignarPinCliente' : borrarPinCliente,
+    'obtenerPorPin' : verificarPinAsignado,
+    'verificarCedulaEmpleado' : verificarCedulaEmpleado,
+    'entradasMensuales' : entradas_mensuales,
+    'movimientosMes' : movimientos_mes,
+    'movimientosDia' : movimientos_dia,
+    'duracionConTarjeta' : duracion,
 }
 
-@app.route('/')
-@app.route('/index')
-def index():
-    return "Hello, World!"
-
 @app.route('/verificarPin')
+@app.route('/nuevoCliente')
+@app.route('/verificarCedulaCliente')
+@app.route('/nuevoEmpleado')
+@app.route('/borrarEmpleado')
+@app.route('/cambiarPinEmpleado')
+@app.route('/cambiarPinCliente')
+@app.route('/asignarPinCliente')
+@app.route('/desasignarPinCliente')
+@app.route('/obtenerPorPin')
+@app.route('/verificarCedulaEmpleado')
+@app.route('/entradasMensuales')
+@app.route('/movimientosMes')
+@app.route('/movimientosDia')
+@app.route('/duracionConTarjeta')
 def general_routes():
     try:
         query = urlparse.parse_qs(request.query_string)

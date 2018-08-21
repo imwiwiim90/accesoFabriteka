@@ -134,6 +134,7 @@ def verificarPinAsignado(pin):
 
         else:
             return None
+
 #Se agrega nuevo PinUsuarios y su resectivo registro de tarjeta,retorna True si guardo, False si no se pudo
 def nuevoPinCliente(pin, cedula):
 
@@ -180,6 +181,7 @@ def nuevoPinCliente(pin, cedula):
         writer = pandas.ExcelWriter('RegistroTarjeta.xlsx', engine=None)
         rg.to_excel(writer, sheet_name='Sheet1')
         writer.save()
+    return None
 
 #En caso de que la persona no este en usuarios aqui se haria el registro
 def ingresarNuevoCliente(cedula, nombre , telefono, correo):
