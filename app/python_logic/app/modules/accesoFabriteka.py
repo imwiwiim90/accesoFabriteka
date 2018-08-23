@@ -4,9 +4,6 @@ import pandas
 from datetime import datetime
 import time
 
-
-
-
 # verifica si el pin no existe tanto en empleados como en clientes, retorna True si existe, False si no
 def verificarPin(pin):
 
@@ -196,21 +193,15 @@ def verificarPinAsignado(pin):
     a=0
     files=os.listdir('./')
     pin=str(pin)
-
     if 'PinUsuarios.xlsx' in files:
         df=pandas.read_excel('PinUsuarios.xlsx')
-
         try:
             fe=df.loc[pin]
             cedula=fe[0]
             reg=pandas.read_excel('usuarios.xlsx')
             us=reg.loc[cedula]
             a=1
-            print us
-            print us[0]
-            datos=['cliente',us[0], us[1], us[2], cedula]
-            print datos
-            return datos
+            return ['cliente',us[0], us[1], us[2], cedula]
         except KeyError:
             pass
 
@@ -237,6 +228,9 @@ def verificarPinAsignado(pin):
 def duracion(cedula):
     a=0
     b=0
+    cedula = int(cedula)
+    file_name='RegistroTarjeta.xlsx'
+    files=os.listdir('./')
     if file_name in files:
         rt=pandas.read_excel(file_name)
         if len(rt)==0:
@@ -253,8 +247,9 @@ def duracion(cedula):
                 fentrada=datetime.strptime(entrada,"%Y-%m-%d %H:%M")
                 fsalida=datetime.strptime(salida,"%Y-%m-%d %H:%M")
                 delta=fentrada-fsalida
-                print(delta)
+                return str(delta)
             else:
+                return None
                 print('El usuario no ha salido')
 
 
@@ -263,6 +258,9 @@ def duracion(cedula):
 def entradas_mensuales(cedula, year, mes):
     a=0
     b=0
+    file_name1='RegistroTarjeta.xlsx'
+    file_name2='usuarios.xlsx'
+    files=os.listdir('./')
     if file_name in files:
         rt=pandas.read_excel(file_name)
         if len(rt)==0:
@@ -287,6 +285,9 @@ def entradas_mensuales(cedula, year, mes):
 # Restorna lista de diccionario que contiene los usuarios que ingresaron en el mes dado con la siguiente
 # estructura : {cedula, nombre , telefono , correo, veces este mes}
 def movimientos_mes(year, mes):
+    file_name1='RegistroTarjeta.xlsx'
+    file_name2='usuarios.xlsx'
+    files=os.listdir('./')
     a=0
     if file_name1 in files and file_name2 in files:
         rt=pandas.read_excel(file_name1)
@@ -451,4 +452,3 @@ def cambiarEmpleado(cedula, pin):
     writer = pandas.ExcelWriter('empleados.xlsx', engine=None)
     em.to_excel(writer, sheet_name='Sheet1')
     writer.save()
-

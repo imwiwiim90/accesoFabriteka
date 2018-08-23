@@ -10,11 +10,7 @@ $(document).ready(function() {
 	$('#client-has-rfid').hide();
 
 
-	function getRFID() {
-		return $('#input-rfid').val();
-	}
-	$('#btn-rfid').on('click',() => {
-		var rfid = getRFID();
+	function receiveRFID(rfid) {
 		python.verificarPin(rfid, (response) => {
 			if (response == 'true') {
 				alert('Este pin ya esta asignado');
@@ -25,7 +21,7 @@ $(document).ready(function() {
     			window.location.href = './index.html';
 			});
 		});
-	})
+	}
 
 	function idNotFound(id_) {
 		$('#title-cc').html(id_);
@@ -35,6 +31,7 @@ $(document).ready(function() {
 
 	function saveRFID() {
 		main.getRFID($('#container-loading'));
+		main.listenRFID(receiveRFID);
 		$('#client-id').slideUp();
 		$('#client-info').slideUp();
 		setTimeout(() =>  $('#container-get-rfid').slideDown(),500);
@@ -73,9 +70,9 @@ $(document).ready(function() {
   		var phone = $('#phone').val();
   		var mail = $('#mail').val();
   		
-  		//python.nuevoCliente(cc,name,phone,mail,(response) => {
-  		//	saveRFID();
-  		//});
+  		python.nuevoCliente(cc,name,phone,mail,(response) => {
+  			saveRFID();
+  		});
   });
 });
 

@@ -5,11 +5,7 @@ var python = new Python();
 
 $(document).ready(function() {
 
-	function getRFID() {
-		return $('#input-rfid').val();
-	}
-	$('#btn-rfid').on('click',() => {
-		var rfid = getRFID();
+	function receiveRFID(rfid) {
 		python.verificarPin(rfid,(response) => {
 			if (response == 'false') showContainer('container-not-found');
 			else {
@@ -25,7 +21,7 @@ $(document).ready(function() {
 				})
 			}
 		});	
-	})
+	}
 
 
 	main.getRFID($('#container-loading'));
@@ -35,10 +31,12 @@ $(document).ready(function() {
 
 	var containers = ['container-get-rfid','container-not-found','container-info'];
 	function showContainer(container) {
-		console.log(container)
+		if (container == 'container-get-rfid') main.listenRFID(receiveRFID)
 		containers.forEach((c) => $('#'+c).hide());
 		$('#'+container).show();
 	}
+	showContainer('container-get-rfid');
 
+	
 	$('#btn-again').on('click',() => showContainer('container-get-rfid'))
 });

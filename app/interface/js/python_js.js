@@ -17,6 +17,9 @@ class PythonJS {
 			'movimientosMes',
 			'movimientosDia',
 			'duracionConTarjeta',
+			'clearModule',
+			'getPin',
+			'logsInside',
 		];
 
 
