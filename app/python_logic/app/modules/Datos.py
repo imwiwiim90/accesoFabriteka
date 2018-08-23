@@ -89,7 +89,7 @@ class RegistroTarjeta():
 		self.excelMngr = ExcelManager('RegistroTarjeta.xlsx',['Cedula','Fecha','Hora','Entrada/salida'])
 
 	def getLastEntrance(self,cedula):
-		lastRegister = self.excelMngr.find('Cedula',cedula)[:-2]
+		lastRegister = self.excelMngr.find('Cedula',cedula)[-2:]
 		if lastRegister[0]['Entrada/salida'] == 'Entrada':
 			return lastRegister[0]
 		else:
@@ -110,6 +110,9 @@ class RegistroPuerta():
 	def getFromDatetime(self,cedula,datetime_str):
 		d = parser.parse(datetime_str)
 		items =  self.excelMngr.find('cedula',cedula)
+		print datetime_str
+		print items
+		print [item for item in items if d <= parser.parse(item['datetime'])]
 		return [item for item in items if d <= parser.parse(item['datetime'])]
 
 

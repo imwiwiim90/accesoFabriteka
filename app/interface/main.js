@@ -1,5 +1,6 @@
-const {app, BrowserWindow} = require('electron')
-  
+  const {app, BrowserWindow, Menu, MenuItem} = require('electron')
+  const url = require('url')
+  const path = require('path')
   // Keep a global reference of the window object, if you don't, the window will
   // be closed automatically when the JavaScript object is garbage collected.
   let win
@@ -26,7 +27,10 @@ const {app, BrowserWindow} = require('electron')
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
-  app.on('ready', createWindow)
+  app.on('ready', () => {
+    setMainMenu();
+    createWindow();
+  })
   
   // Quit when all windows are closed.
   app.on('window-all-closed', () => {
@@ -46,4 +50,29 @@ const {app, BrowserWindow} = require('electron')
   })
   
   // In this file you can include the rest of your app's specific main process
-  // code. You can also put them in separate files and require them here.
+  // code. You can also put them in separate files and require them here. 
+
+
+
+function setMainMenu() {
+  const menuTemplate = [
+    {
+        label: "Electron",
+        submenu: [{role: 'TODO'}]
+    },
+    {
+        label: "Empleados",
+        submenu: [
+          {
+            label: 'Nuevo empleado',
+            click: () => {
+              win.loadFile('new_employee.html')
+            },
+          },
+
+        ]
+    },
+  ];
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
+}
+
