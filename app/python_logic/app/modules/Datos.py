@@ -68,7 +68,7 @@ class ExcelManager():
 
 class Usuarios():
 	def __init__(self):
-		self.excelMngr= ExcelManager('usuarios.xlsx',['Cedula','Nombre','Telefono'],'Cedula')
+		self.excelMngr= ExcelManager('.usuarios.xlsx',['Cedula','Nombre','Telefono'],'Cedula')
 		self.registroPuerta = RegistroPuerta()
 		self.registroTarjeta = RegistroTarjeta()
 
@@ -86,7 +86,7 @@ class Usuarios():
 
 class RegistroTarjeta():
 	def __init__(self):
-		self.excelMngr = ExcelManager('RegistroTarjeta.xlsx',['Cedula','Fecha','Hora','Entrada/salida'])
+		self.excelMngr = ExcelManager('.RegistroTarjeta.xlsx',['Cedula','Fecha','Hora','Entrada/salida'])
 
 	def getLastEntrance(self,cedula):
 		lastRegister = self.excelMngr.find('Cedula',cedula)[-2:]
@@ -98,7 +98,7 @@ class RegistroTarjeta():
 
 class RegistroPuerta():
 	def __init__(self):
-		self.excelMngr = ExcelManager('RegistroPuerta.xlsx',['cedula','datetime'])
+		self.excelMngr = ExcelManager('.RegistroPuerta.xlsx',['cedula','datetime'])
 
 	def register(self,pin):
 		[_type,name,phone,mail,cc] = fabritek.verificarPinAsignado(pin)

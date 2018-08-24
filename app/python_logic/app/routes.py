@@ -25,6 +25,7 @@ functions = {
     'movimientosMes' : movimientos_mes,
     'movimientosDia' : movimientos_dia,
     'duracionConTarjeta' : duracion,
+    'usuariosConTarjeta' : usuariosConTarjeta,
 }
 
 ##### INIT #####
@@ -54,6 +55,7 @@ moduloEntrada.start()
 @app.route('/movimientosMes')
 @app.route('/movimientosDia')
 @app.route('/duracionConTarjeta')
+@app.route('/usuariosConTarjeta')
 def general_routes():
     try:
         query = urlparse.parse_qs(request.query_string)
