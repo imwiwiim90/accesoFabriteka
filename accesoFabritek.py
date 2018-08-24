@@ -466,7 +466,42 @@ def usuariosConTarjeta():
             except:
                 pass
         return uct
+#Exporta excel con movimientos en todos los meses anteriores 
+def exportarDatos(path):
+    filename1 = '.usuarios.xlsx'
+    filename2 = '.RegistroTarjeta.xlsx'
+    fecha_ant = ' '
+    us=pandas.read_excel(filename1)
+    writer = pandas.ExcelWriter(path, engine=None)
+    us.to_excel(writer, sheet_name='Información de Usuarios')
 
+    rg=pandas.read_excel(filename2)
+    rg_f=rg.set_index('Fecha')
+    rg_f=rg_f.index.values.tolist()
+
+    for f in rg_f:
+        a=0
+        fecha=datetime.strptime(f,"%Y-%m-%d")
+        fecha_mes=fecha.strftime("%Y-%m")
+        año=fecha.strftime("%Y")
+        mes=fecha.strftime("%m")
+        año_mes=fecha.strftime("%Y-%B")
+        if fecha_ant not in f:
+            mm=movimientos_mes(año, mes)
+            m1=mm[0]
+            rr = pandas.DataFrame({ a : [m1['cedula'],m1['nombre'],m1['telefono'],m1['correo'],m1['entradas']]})
+            try:
+                mm=mm[1:]
+                for m in mm:
+                    a=a+1
+                    rr[a] = [m['cedula'],m['nombre'],m['telefono'],m['correo'],m['entradas']]
+            except:
+                pass
+            rr=rr.T
+            rr.columns=['Cedula','Nombre', 'Telefono', 'Correo', 'Entradas este mes']
+            rr.to_excel(writer, sheet_name=año_mes)
+        fecha_ant=fecha_mes
+    writer.save()
 # class ventanas(tk.Tk):
 #
 #     def __init__(self, *args, **kwargs):
