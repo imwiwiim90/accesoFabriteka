@@ -29,6 +29,10 @@ input.lg {
 
 }
 
+a {
+	text-decoration: none;
+}
+
 button.lg {
 	display: block;
 	margin: auto;

@@ -64,9 +64,15 @@ function setMainMenu() {
         label: "Empleados",
         submenu: [
           {
-            label: 'Nuevo empleado',
+            label: 'Nuevo',
             click: () => {
               win.loadFile('new_employee.html')
+            },
+          },
+          {
+            label: 'Cambiar Tarjeta',
+            click: () => {
+              win.loadFile('employee_change_card.html')
             },
           },
 

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Fabriteka</title>
+      <link rel="stylesheet" type="text/css" href="./css/fonts.css">
+      <link rel="stylesheet" type="text/css" href="./css/main.css">
+      <link rel="stylesheet" type="text/css" href="./css/index.css">
+    </head>
+    <body>
+      <div id='main-container'>
+        <div id='client-id'>
+          <h1>Ingresa la cédula del cliente</h1>
+          <input type='text' class='lg' id='inpt-cc'/>
+          <br/>
+          <button class='lg' id='btn-check-id'>Ingresar</button>
+        </div>
+        <div id='container-is-not-client'>
+          <h1>La cédula <span id='title-cc'></span> no pertenece a ningun cliente</h1>
+          <h2>Si estas tratando de cambiar la tarjeta de un empleado hazlo desde el menú superior</h2>
+        </div>
+        <div id='container-not-card'>
+          <h1>Este cliente no tiene una tarjeta asignada, ve a la sección de entrada para hacer la asignación</h1>
+        </div>
+        <div id='container-get-rfid'>
+          <div id='container-loading'></div>
+          <h1>Carga la nueva tarjeta con la información del cliente</h1>
+        </div>
+      </div>
+      <div id='side-menu'>
+        <a href='./index.html'><button id='btn-back'>Volver</button></a>
+      </div>
+    </body>
+    <script type="text/javascript" src='./js/python_js.js'></script>
+    <script type="text/javascript" src='./js/client_change_card.js'></script>
+  </html>

@@ -51,9 +51,19 @@ $(document).ready(function() {
     window.location.href = './' + id_ + '.html';
   }
 
+  function setUsersWithCard() {
+  	python.usuariosConTarjeta((users)=> {
+  		if (users == 1) $('#clients-card').html('1 cliente');
+  		else  $('#clients-card').html(users + ' clientes');
+  		setTimeout(setUsersWithCard,5000);	
+  	})
+  }
+  setUsersWithCard()
+
   $('#btn-entrance').on('click',btnOnClick)
   $('#btn-verify').on('click',btnOnClick)
   $('#btn-exit').on('click',btnOnClick)
+  $('#btn-client_change_card').on('click',btnOnClick)
 
 });
 

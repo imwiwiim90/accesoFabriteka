@@ -2,24 +2,25 @@ class PythonJS {
 	constructor() {
 		console.log('contructed')
 		var functions_name = [
-			'verificarPin',
-			'nuevoCliente',
-			'nuevoEmpleado',
-			'verificarCedulaCliente',
+			'asignarPinCliente', 
 			'borrarEmpleado', 
-			'cambiarPinEmpleado',
-			'cambiarPinCliente',
-			'asignarPinCliente',
-			'desasignarPinCliente',
-			'obtenerPorPin',
-			'verificarCedulaEmpleado',
-			'entradasMensuales',
-			'movimientosMes',
-			'movimientosDia',
-			'duracionConTarjeta',
+			'cambiarPinCliente', // (cedula,pin)
+			'cambiarPinEmpleado', // (cedula,pin)
 			'clearModule',
+			'desasignarPinCliente',
+			'duracionConTarjeta',
+			'entradasMensuales',
 			'getPin',
 			'logsInside',
+			'movimientosDia',
+			'movimientosMes',
+			'nuevoCliente',
+			'nuevoEmpleado',
+			'obtenerPorPin',
+			'usuariosConTarjeta',
+			'verificarCedulaCliente',
+			'verificarCedulaEmpleado',
+			'verificarPin',
 		];
 
 

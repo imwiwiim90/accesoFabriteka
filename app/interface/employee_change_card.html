@@ -9,22 +9,18 @@
     </head>
     <body>
       <div id='main-container'>
-        <div id='client-info'>
-          <h2>Nuevo empleado</h2>
-          <label class='sm'>Cédula</label>
-          <input type='text' class='lg' id='cc'/>
-          <label class="sm">Nombre</label>
-          <input type='text' class='lg' id='name'/>
-          <label class="sm">Telefono</label>
-          <input type='text' class='lg' id='phone'/>
-          <label class="sm">Email</label>
-          <input type='text' class='lg' id='mail'/>
-
-          <button class='lg' id='btn-submit-info'>Crear</button>
+        <div id='employee-id'>
+          <h1>Ingresa la cédula del empleado</h1>
+          <input type='text' class='lg' id='inpt-cc'/>
+          <br/>
+          <button class='lg' id='btn-check-id'>Ingresar</button>
+        </div>
+        <div id='container-is-not-employee'>
+          <h1>La cédula <span id='title-cc'></span> no pertenece a ningun empleado</h1>
         </div>
         <div id='container-get-rfid'>
           <div id='container-loading'></div>
-          <h1>Carga la tarjeta con la información</h1>
+          <h1>Carga la nueva tarjeta con la información del empleado</h1>
         </div>
       </div>
       <div id='side-menu'>
@@ -32,5 +28,5 @@
       </div>
     </body>
     <script type="text/javascript" src='./js/python_js.js'></script>
-    <script type="text/javascript" src='./js/new_employee.js'></script>
+    <script type="text/javascript" src='./js/employee_change_card.js'></script>
   </html>
