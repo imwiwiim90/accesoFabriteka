@@ -1,4 +1,4 @@
-  const {app, BrowserWindow, Menu, MenuItem} = require('electron')
+  const {app, BrowserWindow, Menu, MenuItem, dialog} = require('electron')
   const url = require('url')
   const path = require('path')
   // Keep a global reference of the window object, if you don't, the window will
@@ -76,6 +76,37 @@ function setMainMenu() {
             },
           },
 
+        ]
+    },
+    {
+        label: "Usuarios",
+        submenu: [
+          {
+            label: 'Entrada',
+            click: () => {
+              win.loadFile('entrance.html')
+            },
+          },
+          {
+            label: 'Salida',
+            click: () => {
+              win.loadFile('exit.html')
+            },
+          },
+          {
+            label: 'Perdida',
+            click: () => {
+              win.loadFile('client_change_card.html')
+            },
+          },
+          {
+            label: 'Algo',
+            click: () => {
+              dialog.showSaveDialog(function (fileNames) {
+                console.log(fileNames)
+              }); 
+            },
+          }
         ]
     },
   ];

@@ -85,6 +85,11 @@ def logsInside():
     logs  = users.getLogsFromLastEntrance(*query['data[]'])
     return json.dumps(logs)
 
+@app.route('/usersInside')
+def usersInside():
+    users = Usuarios()
+    return json.dumps(users.getInside())
+
 
 
 

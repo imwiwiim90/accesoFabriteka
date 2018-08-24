@@ -60,6 +60,16 @@ $(document).ready(function() {
   }
   setUsersWithCard()
 
+  function setUsersInside() {
+  	python.usersInside((users)=> {
+  		users = JSON.parse(users)
+  		if (users.length == 1) $('#clients-inside').html('1 cliente');
+  		else  $('#clients-inside').html(users.length + ' clientes');
+  		setTimeout(setUsersInside,5000);	
+  	})
+  }
+  setUsersInside()
+
   $('#btn-entrance').on('click',btnOnClick)
   $('#btn-verify').on('click',btnOnClick)
   $('#btn-exit').on('click',btnOnClick)

@@ -434,7 +434,7 @@ def duracion(cedula):
                 fentrada=datetime.strptime(entrada,"%Y-%m-%d %H:%M:%S")
                 fsalida=datetime.strptime(salida,"%Y-%m-%d %H:%M:%S")
                 delta=fentrada-fsalida
-                return delta
+                return str(delta)
             else:
                 pass
 

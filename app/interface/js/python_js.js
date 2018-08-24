@@ -17,6 +17,7 @@ class PythonJS {
 			'nuevoCliente',
 			'nuevoEmpleado',
 			'obtenerPorPin',
+			'usersInside',
 			'usuariosConTarjeta',
 			'verificarCedulaCliente',
 			'verificarCedulaEmpleado',

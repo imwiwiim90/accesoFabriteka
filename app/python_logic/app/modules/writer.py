@@ -1,6 +1,6 @@
 import serial.tools.list_ports
 
-device = '/dev/ttyp2'
+device = '/dev/ttyp3'
 s = serial.Serial(device, 9600, timeout=1)
 prefix = 'Card UID: '
 while True:

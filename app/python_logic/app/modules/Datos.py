@@ -55,6 +55,24 @@ class ExcelManager():
 		else:
 			return [{k:item.iloc[i][k] for k in self.keys} for i in range(len(item))]
 
+	def all(self):
+		data = pandas.read_excel(self.filename)
+		if len(data) == 0:
+			return []
+		# set data as unindexed
+		if self.index:
+			new_data = {}
+			for k in self.keys:
+				new_data[k] = []
+				for index in data.index.values:
+					if k == self.index:
+						new_data[k].append(index)
+					else:
+						new_data[k].append(data.loc[index][k])
+			data = pandas.DataFrame({k: new_data[k] for k in self.keys})
+
+		return [{k:data.iloc[i][k] for k in self.keys} for i in range(len(data))]
+
 	def save_entry(self,item,key):
 		data = pandas.read_excel(self.filename)
 		data = data.loc[data[key] == item[key]]
@@ -83,6 +101,34 @@ class Usuarios():
 		last_entrance = self.registroTarjeta.getLastEntrance(cedula)
 		return self.registroPuerta.getFromDatetime(cedula,last_entrance['Fecha'] + ' ' + last_entrance['Hora'])
 
+	def getInside(self):
+		rgCard = self.registroTarjeta.all()
+		rgLogs = self.registroPuerta.all()
+
+		users = {}
+		for rgc in rgCard:
+			cc = rgc['Cedula']
+			if rgc['Entrada/salida'] == 'Entrada':
+				rgc['datetime'] = rgc['Fecha'] + ' ' + rgc['Hora']
+				users[cc] = rgc
+			elif cc in users:
+				del users[cc]
+		for rgl in rgLogs:
+			if not rgl['cedula'] in users:
+				continue
+			user = users[rgl['cedula']]
+			dateDoor = parser.parse(rgl['datetime'])
+			dateCard = parser.parse(user['datetime'])
+			if dateDoor > dateCard:
+				if not 'inside' in user:
+					user['inside'] = True 
+				else:
+					user['inside'] = not user['inside']
+
+		insiders = [k for k in users]
+		return insiders
+
+
 
 class RegistroTarjeta():
 	def __init__(self):
@@ -94,6 +140,8 @@ class RegistroTarjeta():
 			return lastRegister[0]
 		else:
 			return lastRegister[1]
+	def all(self):
+		return self.excelMngr.all()
 
 
 class RegistroPuerta():
@@ -114,6 +162,8 @@ class RegistroPuerta():
 		print items
 		print [item for item in items if d <= parser.parse(item['datetime'])]
 		return [item for item in items if d <= parser.parse(item['datetime'])]
+	def all(self):
+		return self.excelMngr.all()
 
 
 
