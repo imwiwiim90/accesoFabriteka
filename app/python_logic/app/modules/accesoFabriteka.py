@@ -8,6 +8,7 @@ import pandas
 import os
 from datetime import datetime
 import time
+import json
 
 LARGE_FONT=("Verdana",12)
 NORM_FONT=("Verdana",10)
@@ -42,10 +43,8 @@ def verificarPin(pin):
 
 #retorna 1 si tiene un pin asignado, 2 si la cedula ya existe en el sistema y 3 si es una cedula nueva
 def verificarCedulaCliente(cedula):
-
         files=os.listdir('./')
         cedula=int(cedula)
-
         if '.PinUsuarios.xlsx' in files:
             us=pandas.read_excel('.PinUsuarios.xlsx')
             us2=us.set_index('Cedula')
@@ -328,10 +327,20 @@ def entradas_mensuales(cedula, ano, mes):
 
 #Restorna lista de diccionario que contiene los usuarios que ingresaron en el mes dado con la siguiente
 #estructura : {cedula, nombre , telefono , correo, veces este mes}
-def movimientos_mes(ano, mes):
+def movimientos_mes(ano, mes, filenames = []):
     file_name1='.RegistroTarjeta.xlsx'
     file_name2='.usuarios.xlsx'
-    files=os.listdir('./')
+    listdir = './'
+    if (len(filenames) == 2):
+        file_name1 = filenames[0]
+        file_name2 = filenames[1]
+        listdir = '/'.join(file_name1.split('/')[:-1]) + '/'
+
+    print listdir
+    files=os.listdir(listdir)
+    if len(filenames) == 2:
+        files = [listdir + f for f in files]
+    print files
     a=0
     if file_name1 in files and file_name2 in files:
         rt=pandas.read_excel(file_name1)
@@ -346,6 +355,7 @@ def movimientos_mes(ano, mes):
             for u in usr:
                 a=0
                 b=0
+                print rtf
                 for f in rtf:
                     cc=int(rt.iloc[a][0])
                     fe=str(rt.iloc[a][1])
@@ -437,6 +447,45 @@ def duracion(cedula):
                 return str(delta)
             else:
                 pass
+def exportarDatos(path):
+    #filename1 = '.usuarios.xlsx'
+    #filename2 = '.RegistroTarjeta.xlsx'
+
+    filename1 = '/Users/imwiwiim90/Desktop/hadronlab/accesoFabriteka/app/interface/.usuarios.xlsx'
+    filename2 = '/Users/imwiwiim90/Desktop/hadronlab/accesoFabriteka/app/interface/.RegistroTarjeta.xlsx'
+    filenames = [filename2,filename1]
+    fecha_ant = ' '
+    us=pandas.read_excel(filename1)
+    writer = pandas.ExcelWriter(path, engine=None)
+    us.to_excel(writer, sheet_name='Informacion de Usuarios')
+
+    rg=pandas.read_excel(filename2)
+    rg_f=rg.set_index('Fecha')
+    rg_f=rg_f.index.values.tolist()
+
+    for f in rg_f:
+        a=0
+        fecha=datetime.strptime(f,"%Y-%m-%d")
+        fecha_mes=fecha.strftime("%Y-%m")
+        ano=fecha.strftime("%Y")
+        mes=fecha.strftime("%m")
+        ano_mes=fecha.strftime("%Y-%B")
+        if fecha_ant not in f:
+            mm=movimientos_mes(ano, mes, filenames = filenames)
+            m1=mm[0]
+            rr = pandas.DataFrame({ a : [m1['cedula'],m1['nombre'],m1['telefono'],m1['correo'],m1['entradas']]})
+            try:
+                mm=mm[1:]
+                for m in mm:
+                    a=a+1
+                    rr[a] = [m['cedula'],m['nombre'],m['telefono'],m['correo'],m['entradas']]
+            except:
+                pass
+            rr=rr.T
+            rr.columns=['Cedula','Nombre', 'Telefono', 'Correo', 'Entradas este mes']
+            rr.to_excel(writer, sheet_name=ano_mes)
+        fecha_ant=fecha_mes
+    writer.save()
 
 # retorna todos los datos del usuario en una lista
 def usuarioCedula(cedula):

@@ -70,6 +70,7 @@ def general_routes():
 
 @app.route('/clearModule')
 def clearModule():
+    print 'clear module'
     moduloEntrada.clear()
     return json.dumps(True)
 

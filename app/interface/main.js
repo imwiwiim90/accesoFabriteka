@@ -1,6 +1,10 @@
   const {app, BrowserWindow, Menu, MenuItem, dialog} = require('electron')
   const url = require('url')
   const path = require('path')
+
+  const exec = require('child_process').exec;
+  const { spawn } = require('child_process');
+
   // Keep a global reference of the window object, if you don't, the window will
   // be closed automatically when the JavaScript object is garbage collected.
   let win
@@ -30,6 +34,7 @@
   app.on('ready', () => {
     setMainMenu();
     createWindow();
+    activateAPI();
   })
   
   // Quit when all windows are closed.
@@ -59,6 +64,28 @@ function setMainMenu() {
     {
         label: "Electron",
         submenu: [{role: 'TODO'}]
+    },
+    {
+      label: 'Archivo',
+      submenu: [
+        {
+            label: 'Exportar',
+            click: () => {
+              dialog.showSaveDialog(function (fileName) {
+                  const python_command = "python -c 'import sys; sys.path.insert(0,\"../python_logic/app/modules/\"); from accesoFabriteka import *; exportarDatos(\""+fileName+ ".xlsx" +"\")'"
+
+                  const child = exec(python_command,
+                    (error, stdout, stderr) => {
+                        console.log(`stdout: ${stdout}`);
+                        console.log(`stderr: ${stderr}`);
+                        if (error !== null) {
+                            console.log(`exec error: ${error}`);
+                        }
+                  });
+              });
+            }
+        }
+      ]
     },
     {
         label: "Empleados",
@@ -99,17 +126,23 @@ function setMainMenu() {
               win.loadFile('client_change_card.html')
             },
           },
-          {
-            label: 'Algo',
-            click: () => {
-              dialog.showSaveDialog(function (fileNames) {
-                console.log(fileNames)
-              }); 
-            },
-          }
         ]
     },
   ];
   Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
+}
+
+function activateAPI() {
+      const python_command = "export FLASK_APP=../python_logic/python_logic.py && flask run"
+      const child = spawn('bash',['test.sh']);
+
+      child.stdout.setEncoding('utf8');
+      child.stdout.on('data',console.log);
+      child.stderr.setEncoding('utf8');
+      child.stderr.on('data',console.log);
+      child.on('close', (code) => {
+        console.log(`child process exited with code ${code}`);
+      });
+     
 }
 
